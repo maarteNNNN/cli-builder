@@ -44,7 +44,9 @@ const commands = {
           command: () => console.log('to run this type `deep nesting works as command`')
           // Or with help
           command: {
+            // this get executed as `deep nesting works as command`
             execute: () => console.log('to run this type `deep nesting works as command`'),
+            // this get executed as `deep nesting works as command help`
             help: () => console.log('help of command')
           }
         }
