@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { CliBuilder } = require('../../');
+const { CliInterface } = require('../src');
 
 // DO NOT ADD HELP TO ROOT.
 const commands = {
@@ -8,9 +8,11 @@ const commands = {
     execute: () => console.log('this is the test run'),
     help: () => console.log('help of test'),
     testing: {
+      execute: () => console.log('executing testing'),
       help: () => console.log('testing help')
     },
     testing2: {
+      execute: () => console.log('executing testing2'),
       help: () => console.log('testing2 help')
     }
   },
@@ -20,7 +22,7 @@ const commands = {
   },
 };
 
-const cli = new CliBuilder(
+const cli = new CliInterface(
   {
     interactive: true,
     helpFooter: 'This is shown in the footer',

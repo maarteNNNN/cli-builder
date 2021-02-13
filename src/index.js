@@ -1,12 +1,11 @@
 const argv = require('minimist')(process.argv.slice(2));
 const { kebabCaseToCamel, promptInput } = require('./lib');
 
-class CliBuilder {
+class CliInterface {
   /**
-   *
+   * Instantiates a cli interface
    * @param {Object} options options
    * @param {string} options.command Command to put in logs
-   * @param {string} options.link Link to repo, this can help your error message
    * @param {boolean} options.enableInteractive Allow interactive mode
    * @param {Promise} options.beforeLoad Function to execute before initialization
    * @param {Promise} options.afterLoad Function to execute after initialization
@@ -174,7 +173,7 @@ class CliBuilder {
 }
 
 module.exports = {
-  CliBuilder,
+  CliInterface,
   kebabCaseToCamel,
   promptInput,
 };
