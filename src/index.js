@@ -1,7 +1,7 @@
 const argv = require('minimist')(process.argv.slice(2));
 const { kebabCaseToCamel, promptInput } = require('./lib');
 
-class Cli {
+class CliBuilder {
   /**
    *
    * @param {Object} options options
@@ -10,6 +10,8 @@ class Cli {
    * @param {boolean} options.enableInteractive Allow interactive mode
    * @param {Promise} options.beforeLoad Function to execute before initialization
    * @param {Promise} options.afterLoad Function to execute after initialization
+   * @param {string} options.helpHeader Header to show in help
+   * @param {string} options.helpFooter Footer to show in help
    */
   constructor(options, commands) {
     this.options = options || {};
@@ -36,12 +38,22 @@ class Cli {
 
         this.getHelpCommands(commands);
 
-        for (let i = 0; i < this.helpArray.length; i++) {
-          const helpLog = this.helpArray[i];
-          await helpLog();
-        }
+        this.logHelpCommands();
       },
     };
+  }
+
+  logHelpCommands() {
+    if (this.options.helpHeader) console.log(this.options.helpHeader);
+
+    for (let i = 0; i < this.helpArray.length; i++) {
+      const helpLog = this.helpArray[i];
+      helpLog();
+    }
+
+    if (this.options.helpFooter) console.log(this.options.helpFooter);
+
+    this.helpArray = [];
   }
 
   getHelpCommands(object) {
@@ -96,6 +108,15 @@ class Cli {
       for (let i = 0; i < commands.length + 1; i++) {
         const currentValue = commands[i] ? kebabCaseToCamel(commands[i]) : null;
 
+        if (
+          (currentValue === 'help' || currentValue === '--help') &&
+          commands.length - 1 === i
+        ) {
+          this.getHelpCommands(accumulator);
+          this.logHelpCommands();
+          return;
+        }
+
         if (typeof accumulator.execute === 'function' && !currentValue)
           return await accumulator.execute();
 
@@ -105,6 +126,8 @@ class Cli {
             if (typeof accumulator === 'function') await accumulator();
           } else if (typeof accumulator[currentValue] === 'function')
             await accumulator[currentValue]();
+          else if (typeof accumulator['--' + currentValue] === 'function')
+            await accumulator['--' + currentValue]();
           else throw new Error('command invalid');
         }
       }
@@ -151,7 +174,7 @@ class Cli {
 }
 
 module.exports = {
-  Cli,
+  CliBuilder,
   kebabCaseToCamel,
   promptInput,
 };
