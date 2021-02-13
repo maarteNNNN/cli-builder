@@ -11,6 +11,7 @@ class CliInterface {
    * @param {Promise} options.afterLoad Function to execute after initialization
    * @param {string} options.helpHeader Header to show in help
    * @param {string} options.helpFooter Footer to show in help
+   * @param {Object} commands Command object with function to execute
    */
   constructor(options, commands) {
     this.options = options || {};
