@@ -50,6 +50,9 @@ const commands = {
         }
       }
     }
+  },
+  runSomeFunction: async () => {
+    // DO SOME INSANE LOGIC HERE
   }
 }
 ```
@@ -59,4 +62,5 @@ Help is executed on the object. Eg. in this case executing `test help` will reve
 Running a command is in a nesting way: `deep nesting works as command` for the example above (executes `execute` function case it's an object).
 `deep nesting works as command help` (executes `help` function in case it's an object)
 
-
+functions are added as camelCase but inside the command line you'll need to use kebab-case:
+`run-some-function` will call function `runSomeFunction`.

@@ -33,6 +33,9 @@ const commands = {
       },
     },
   },
+  runSomeFunction: async () => {
+    // DO SOME INSANE LOGIC HERE
+  }
 }
 
 const cli = new CliInterface(
