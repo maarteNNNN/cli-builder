@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "cli-builder": "examples/bin/cli.js"
+    "cli-builder": "bin/example-cli.js"
   },
   "keywords": [],
   "author": "Maarten Coppens",

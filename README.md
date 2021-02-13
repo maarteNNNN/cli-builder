@@ -4,7 +4,7 @@
 npm install cli-builder
 ```
 
-Take a look at `examples/bin/cli.js`
+Take a look at `bin/example-cli.js`
 
 Instantiate CLI with `new CliInterface({ ...options }, commands)`
 
@@ -36,7 +36,27 @@ const commands = {
     execute: () => console.log('this is the test2 run'),
     help: () => console.log('help of test2'),
   },
+  deep: {
+    nesting: {
+      works: {
+        as: {
+          // Without help
+          command: () => console.log('to run this type `deep nesting works as command`')
+          // Or with help
+          command: {
+            execute: () => console.log('to run this type `deep nesting works as command`'),
+            help: () => console.log('help of command')
+          }
+        }
+      }
+    }
+  }
 }
 ```
 
 Help is executed on the object. Eg. in this case executing `test help` will reveal help of `test` and all child help functions (this case `testing.help()` and `testing2.help()`)
+
+Running a command is in a nesting way: `deep nesting works as command` for the example above (executes `execute` function case it's an object).
+`deep nesting works as command help` (executes `help` function in case it's an object)
+
+
