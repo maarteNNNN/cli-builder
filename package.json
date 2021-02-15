@@ -1,6 +1,6 @@
 {
   "name": "@maartennnn/cli-builder",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A cli builder tool",
   "main": "src/index.js",
   "scripts": {
@@ -17,7 +17,10 @@
     "url": "https://github.com/maarteNNNN/cli-builder/issues"
   },
   "homepage": "https://github.com/maarteNNNN/cli-builder#readme",
-  "keywords": ["cli", "command"],
+  "keywords": [
+    "cli",
+    "command"
+  ],
   "author": "Maarten Coppens",
   "license": "MIT",
   "dependencies": {
