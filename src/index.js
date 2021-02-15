@@ -110,7 +110,8 @@ class CliInterface {
 
         if (
           (currentValue === 'help' || currentValue === '--help') &&
-          commands.length - 1 === i
+          commands.length - 1 === i &&
+          commands.length !== 1
         ) {
           this.getHelpCommands(accumulator);
           this.logHelpCommands();
