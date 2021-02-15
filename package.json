@@ -9,6 +9,14 @@
   "bin": {
     "cli-builder": "bin/example-cli.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maarteNNNN/cli-builder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maarteNNNN/cli-builder/issues"
+  },
+  "homepage": "https://github.com/maarteNNNN/cli-builder#readme",
   "keywords": ["cli", "command"],
   "author": "Maarten Coppens",
   "license": "MIT",
