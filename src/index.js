@@ -10,6 +10,7 @@ class CliInterface {
    * @param {Array} options.exceptions Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
    * @param {string} options.helpHeader Header to show in help
    * @param {string} options.helpFooter Footer to show in help
+   * @param {string} options.binCommand If error it will show how to access the help command
    */
   constructor(options = {}) {
     this.argv = argv;
@@ -224,7 +225,7 @@ class CliInterface {
     this.errorLog(
       this.options.interactive
         ? 'Type help to see all available commands.'
-        : 'Command is not found. Run ${this.options.command}  --help to see all available commands.',
+        : `Command is not found. Run ${this.options.binCommand}  --help to see all available commands.`,
     );
   }
 
