@@ -42,6 +42,8 @@ class CliInterface {
       }
     }
 
+    if(!this.options.bindActionArgs) this.options.bindActionArgs = []
+
     this.helpArray = [];
     this.actions = {};
 
@@ -182,14 +184,16 @@ class CliInterface {
           else if (typeof accumulator['--' + currentValue] === 'function')
             await accumulator['--' + currentValue]();
           else {
-            debugger;
             throw new Error('command invalid');
           }
         }
       }
     } catch (e) {
-      debugger;
-      this.invalidCommand();
+      if (e.message === 'command invalid') {
+        this.invalidCommand();
+      } else {
+        this.errorLog(e.message)
+      }
     }
 
     if (this.options.interactive) this.interactiveCmd();
