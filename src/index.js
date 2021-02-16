@@ -1,6 +1,8 @@
 const argv = require('minimist')(process.argv.slice(2));
 const { kebabCaseToCamel, promptInput, camelCaseToKebab } = require('./lib');
 
+// TODO: Implement an automatic help header with interactive and non-interactive usage, when using help non-interactivaly
+// TODO: Align columns in help
 class CliInterface {
   /**
    * Instanciate the cli
@@ -43,7 +45,7 @@ class CliInterface {
       }
     }
 
-    if(!this.options.bindActionArgs) this.options.bindActionArgs = []
+    if (!this.options.bindActionArgs) this.options.bindActionArgs = [];
 
     this.helpArray = [];
     this.actions = {};
@@ -170,6 +172,7 @@ class CliInterface {
         ) {
           this.getHelpCommands(accumulator, commands);
           this.logHelpCommands();
+          if (this.options.interactive) await this.interactiveCmd();
           return;
         }
 
@@ -193,7 +196,7 @@ class CliInterface {
       if (e.message === 'command invalid') {
         this.invalidCommand();
       } else {
-        this.errorLog(e.message)
+        this.errorLog(e.message);
       }
     }
 
@@ -225,7 +228,9 @@ class CliInterface {
     this.errorLog(
       this.options.interactive
         ? 'Type help to see all available commands.'
-        : `Command is not found. Run ${this.options.binCommand ? this.options.binCommand + ' ' : ''}--help to see all available commands.`,
+        : `Command is not found. Run ${
+            this.options.binCommand ? this.options.binCommand + ' ' : ''
+          }--help to see all available commands.`,
     );
   }
 
