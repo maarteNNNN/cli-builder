@@ -21,7 +21,6 @@ class CliInterface {
     this.helpArray = [];
   }
 
-  // TODO: Get previous values
   getHelpCommands(accumulator, commands, previousValue = null) {
     const keys = Object.keys(accumulator);
 
@@ -33,7 +32,6 @@ class CliInterface {
         (typeof currentValue === 'string' && key === 'help') ||
         (typeof currentValue === 'function' && key !== 'execute')
       ) {
-        // previousValue = camelCaseToKebab(previousValue);
         // bind for the helpLog function to take
         this.helpArray.push({
           // Add the command if is array join it eg. `some deep nested command` or key as string when it is in the root object
