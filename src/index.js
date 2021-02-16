@@ -7,7 +7,6 @@ class CliInterface {
   /**
    * Instanciate the cli
    * @param {Object} options options
-   * @param {string} options.command Command to put in logs
    * @param {boolean} options.enableInteractive Allow interactive mode
    * @param {Array} options.exceptions Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
    * @param {string} options.helpHeader Header to show in help
@@ -111,12 +110,14 @@ class CliInterface {
    */
   async run(commands = {}) {
     // BIND ARGS TO FUNCTIONS
-    for (let i = 0; i < Object.keys(this.options.actions).length; i++) {
-      const key = Object.keys(this.options.actions)[i];
-      this.actions[key] = this.options.actions[key].bind(
-        this,
-        ...this.options.bindActionArgs,
-      );
+    if(this.options.actions) {
+      for (let i = 0; i < Object.keys(this.options.actions).length; i++) {
+        const key = Object.keys(this.options.actions)[i];
+        this.actions[key] = this.options.actions[key].bind(
+          this,
+          ...this.options.bindActionArgs,
+        );
+      }
     }
 
     // COMMANDS
