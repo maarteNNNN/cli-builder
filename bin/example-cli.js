@@ -2,6 +2,14 @@
 
 const { CliInterface } = require('../src')
 
+const cli = new CliInterface(
+  {
+    interactive: true,
+    helpFooter: 'This is shown in the footer',
+    helpHeader: 'This is shown in the header',
+  },
+)
+
 // DO NOT ADD HELP TO ROOT.
 const commands = {
   test: {
@@ -38,13 +46,4 @@ const commands = {
   }
 }
 
-const cli = new CliInterface(
-  {
-    interactive: true,
-    helpFooter: 'This is shown in the footer',
-    helpHeader: 'This is shown in the header',
-  },
-  commands,
-)
-
-cli.run()
+cli.run(commands)

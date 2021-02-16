@@ -7,8 +7,9 @@ class CliInterface {
    * @param {Object} options options
    * @param {string} options.command Command to put in logs
    * @param {boolean} options.enableInteractive Allow interactive mode
-   * @param {Promise} options.beforeLoad Function to execute before initialization
-   * @param {Promise} options.afterLoad Function to execute after initialization
+   * @param {Array} options.exceptions Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
+   * @param {Promise} options.beforeCommandFn Function to execute before initialization
+   * @param {Promise} options.afterCommandFn Function to execute after initialization
    * @param {string} options.helpHeader Header to show in help
    * @param {string} options.helpFooter Footer to show in help
    * @param {Object} commands Command object with function to execute
@@ -26,29 +27,29 @@ class CliInterface {
 
     if (!this.options.command) this.options.command = '';
 
-    this.commands = commands || {};
+    const defaultExceptions = ['help', 'v', 'version'];
+    if (!this.options.exceptions) this.options.exceptions = defaultExceptions;
+    else
+      this.options.exceptions = [
+        ...new Set([...this.options.exceptions, defaultExceptions]),
+      ];
+
+    // Check if has exceptions, this is only executed when not interactive
+    for (let i = 0; i < this.options.exceptions.length; i++) {
+      const exception = this.options.exceptions[i];
+      if (argv.hasOwnProperty(exception)) {
+        this.options.exception = true;
+      }
+    }
 
     this.helpArray = [];
-
-    this.commands = {
-      ...this.commands,
-      help: async () => {
-        const commands = this.commands;
-        delete commands.help;
-
-        this.getHelpCommands(commands);
-
-        this.logHelpCommands();
-      },
-    };
   }
 
   logHelpCommands() {
     if (this.options.helpHeader) console.log(this.options.helpHeader);
 
     for (let i = 0; i < this.helpArray.length; i++) {
-      const helpLog = this.helpArray[i];
-      helpLog();
+      this.helpArray[i]();
     }
 
     if (this.options.helpFooter) console.log(this.options.helpFooter);
@@ -70,26 +71,41 @@ class CliInterface {
     }
   }
 
-  async run() {
+  async run(commands) {
+    this.commands = commands || {};
+
+    this.commands = {
+      ...this.commands,
+      help: async () => {
+        const commands = this.commands;
+        delete commands.help;
+
+        this.getHelpCommands(commands);
+
+        this.logHelpCommands();
+      },
+    };
+
     // Function to run before initialization
-    if (this.options.preload) await this.options.preload();
+    if (this.options.beforeCommandFn && !this.exception)
+      await this.options.beforeCommandFn();
 
     this.options.interactive
       ? await this.interactiveCmd()
       : await this.commandCmd();
 
     // Function to run after initialization
-    if (this.options.afterLoad) await this.options.afterLoad();
+    if (this.options.afterCommandFn && !this.exception)
+      await this.options.afterCommandFn();
   }
 
   async interactiveCmd() {
-    const cmd = await promptInput('interactive command >');
-    await this.execCmd(cmd);
+    const command = await promptInput('interactive command >');
+    await this.execCmd(command);
   }
 
   async commandCmd() {
     const command = [].concat(argv._, Object.keys(argv).slice(1));
-
     await this.execCmd(command);
   }
 
@@ -129,7 +145,10 @@ class CliInterface {
             await accumulator[currentValue]();
           else if (typeof accumulator['--' + currentValue] === 'function')
             await accumulator['--' + currentValue]();
-          else throw new Error('command invalid');
+          else {
+            debugger;
+            throw new Error('command invalid');
+          }
         }
       }
     } catch (e) {

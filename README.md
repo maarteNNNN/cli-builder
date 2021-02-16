@@ -1,4 +1,9 @@
-# Installing
+# CLI-Builder
+
+This builds cli's very quickly.
+This is a WIP.
+
+## Installing
 
 ```
 npm install cli-builder
@@ -6,7 +11,7 @@ npm install cli-builder
 
 Take a look at `bin/example-cli.js`
 
-Instantiate CLI with `new CliInterface({ ...options }, commands)`
+Instantiate CLI with `new CliInterface({ ...options })`
 
 - `options.command` - Type: `string` Command to put in logs
 - `options.enableInteractive` - Type: `boolean` Allow interactive mode
@@ -14,6 +19,16 @@ Instantiate CLI with `new CliInterface({ ...options }, commands)`
 - `options.afterLoad` - Type: `Promise` Function to execute after initialization
 - `options.helpHeader` - Type: `string` Header to show in help
 - `options.helpFooter` - Type: `string` Footer to show in help
+
+and
+
+and running with
+
+```js
+cli.run(commands)
+```
+
+an example of commands is shown below
 
 ## commands example
 
