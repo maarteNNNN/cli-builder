@@ -74,7 +74,7 @@ const commands = {
 }
 ```
 
-Help is executed on the object. Eg. in this case executing `test help` will reveal help of `test` and all child help functions (this case `testing.help()` and `testing2.help()`)
+Help is executed on the object. Eg. in this case executing `test help` will reveal help of `test` and it's help children (in this case `testing.help` and `testing2.help`)
 
 Running a command is in a nesting way: `deep nesting works as command` for the example above (executes `execute` function case it's an object).
 `deep nesting works as command help` (executes `help` function in case it's an object)
