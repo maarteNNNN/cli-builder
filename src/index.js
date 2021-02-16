@@ -225,7 +225,7 @@ class CliInterface {
     this.errorLog(
       this.options.interactive
         ? 'Type help to see all available commands.'
-        : `Command is not found. Run ${this.options.binCommand}  --help to see all available commands.`,
+        : `Command is not found. Run ${this.options.binCommand && this.options.binCommand + ' '}--help to see all available commands.`,
     );
   }
 
