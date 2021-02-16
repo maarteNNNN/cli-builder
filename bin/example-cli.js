@@ -4,6 +4,7 @@ const { CliInterface } = require('../src')
 
 const cli = new CliInterface(
   {
+    binCommand: 'cli-builder', // refers to naming in `package.json`
     interactive: true,
     helpFooter: 'This is shown in the footer',
     helpHeader: 'This is shown in the header',
