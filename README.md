@@ -1,7 +1,7 @@
 # CLI-Builder
 
 This builds cli's very quickly.
-This is a WIP.
+This is a WIP. As are the docs.
 
 ## Installing
 
@@ -15,10 +15,10 @@ Instantiate CLI with `new CliInterface({ ...options })`
 
 - `options.command` - Type: `string` Command to put in logs
 - `options.enableInteractive` - Type: `boolean` Allow interactive mode
-- `options.beforeLoad` - Type: `Promise` Function to execute before initialization
-- `options.afterLoad` - Type: `Promise` Function to execute after initialization
 - `options.helpHeader` - Type: `string` Header to show in help
 - `options.helpFooter` - Type: `string` Footer to show in help
+- `options.actions` - type `object` Object of functions that you can mount which will bind `cli` and `bindActionArgs` on it (more on `bindActionArgs` later).
+- `options.bindActionArgs` - type `array` Array of any you can pass to the action functions.
 
 and
 
@@ -81,3 +81,40 @@ Running a command is in a nesting way: `deep nesting works as command` for the e
 
 functions are added as camelCase but inside the command line you'll need to use kebab-case:
 `run-some-function` will call function `runSomeFunction`.
+
+`actions` can be used to integrate imported files. You can check out the example of a full-fledged cli implementation in [ldpos-commander](https://github.com/Leasehold/ldpos-commander/). It's basically passing the `cli` as `this`, therefore you can reference `cli` as `this` in your action and `bindActionArgs` will be all of the arguments you pass within that action function eg.:
+
+```js
+const actions = {
+  getUserData = async (id, someFunction, aString, aNumber) => {
+    try {
+      const data = await axios.get(`user/${id}`)
+
+      // this references to the cli object as it's bound
+      this.successLog(data)
+
+      someFunction()
+
+      console.log(aString, aNumber)
+    } catch (e) {
+      throw new Error(e)
+    }
+  }
+}
+
+// Binding below array to `options.bindActionArgs` in `new CmdInterface({ ...options })`
+const options = {
+  bindActionArgs = [123, () => console.log('function executed'), 'a string', 23123]
+}
+
+const cli = new CmdInterface(options)
+
+const commands = {
+  // No arguments are passed here, they are mounted dynamically
+  anActionTest: async () => await cli.actions.getUserData()
+}
+
+cli.run(commands)
+```
+
+using `cli-builder an-action-test` will execute the `getUserData` function with the `bindActionArgs` parameters bound to it.

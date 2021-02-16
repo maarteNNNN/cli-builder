@@ -1,10 +1,54 @@
-const { format } = require('util');
 const argv = require('minimist')(process.argv.slice(2));
 const { kebabCaseToCamel, promptInput, camelCaseToKebab } = require('./lib');
 
 class CliInterface {
-  constructor() {
+  /**
+   * Instanciate the cli
+   * @param {Object} options options
+   * @param {string} options.command Command to put in logs
+   * @param {boolean} options.enableInteractive Allow interactive mode
+   * @param {Array} options.exceptions Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
+   * @param {string} options.helpHeader Header to show in help
+   * @param {string} options.helpFooter Footer to show in help
+   */
+  constructor(options = {}) {
+    this.argv = argv;
+
+    // OPTIONS
+    this.options = options;
+
+    if (!this.options.enableInteractive) this.options.enableInteractive = true;
+
+    this.options.interactive =
+      (!argv._.length || Object.keys(argv).length > 1) &&
+      // Case its --help, --version or -v
+      !Object.keys(argv).slice(1).length &&
+      this.options.enableInteractive;
+
+    if (!this.options.command) this.options.command = '';
+
+    const defaultExceptions = ['help', 'v', 'version'];
+    if (!this.options.exceptions) this.options.exceptions = defaultExceptions;
+    else
+      this.options.exceptions = [
+        ...new Set([...this.options.exceptions, ...defaultExceptions]),
+      ];
+
+    // Check if has exceptions, this is only executed when not interactive
+    for (let i = 0; i < this.options.exceptions.length; i++) {
+      const exception = this.options.exceptions[i];
+      if (argv.hasOwnProperty(exception)) {
+        this.options.exception = true;
+      }
+    }
+
     this.helpArray = [];
+    this.actions = {};
+
+    // HELPER FUNCTIONS FROM LIB
+    this.camelCaseToKebab = camelCaseToKebab;
+    this.kebabCaseToCamel = kebabCaseToCamel;
+    this.promptInput = promptInput;
   }
 
   logHelpCommands() {
@@ -59,42 +103,15 @@ class CliInterface {
   /**
    * Runs the cli interface
    * @param {Object} commands Command object with function to execute
-   * @param {Object} options options
-   * @param {string} options.command Command to put in logs
-   * @param {boolean} options.enableInteractive Allow interactive mode
-   * @param {Array} options.exceptions Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
-   * @param {Promise} options.beforeCommandFn Function to execute before initialization
-   * @param {Promise} options.afterCommandFn Function to execute after initialization
-   * @param {string} options.helpHeader Header to show in help
-   * @param {string} options.helpFooter Footer to show in help
    */
-  async run(commands = {}, options = {}) {
-    // OPTIONS
-    this.options = options;
-
-    if (!this.options.enableInteractive) this.options.enableInteractive = true;
-
-    this.options.interactive =
-      (!argv._.length || Object.keys(argv).length > 1) &&
-      // Case its --help, --version or -v
-      !Object.keys(argv).slice(1).length &&
-      this.options.enableInteractive;
-
-    if (!this.options.command) this.options.command = '';
-
-    const defaultExceptions = ['help', 'v', 'version'];
-    if (!this.options.exceptions) this.options.exceptions = defaultExceptions;
-    else
-      this.options.exceptions = [
-        ...new Set([...this.options.exceptions, defaultExceptions]),
-      ];
-
-    // Check if has exceptions, this is only executed when not interactive
-    for (let i = 0; i < this.options.exceptions.length; i++) {
-      const exception = this.options.exceptions[i];
-      if (argv.hasOwnProperty(exception)) {
-        this.options.exception = true;
-      }
+  async run(commands = {}) {
+    // BIND ARGS TO FUNCTIONS
+    for (let i = 0; i < Object.keys(this.options.actions).length; i++) {
+      const key = Object.keys(this.options.actions)[i];
+      this.actions[key] = this.options.actions[key].bind(
+        this,
+        ...this.options.bindActionArgs,
+      );
     }
 
     // COMMANDS
@@ -113,17 +130,9 @@ class CliInterface {
     };
 
     // EXECUTE CLI
-    // Function to run before initialization
-    if (this.options.beforeCommandFn && !this.exception)
-      await this.options.beforeCommandFn();
-
     this.options.interactive
       ? await this.interactiveCmd()
       : await this.commandCmd();
-
-    // Function to run after initialization
-    if (this.options.afterCommandFn && !this.exception)
-      await this.options.afterCommandFn();
   }
 
   async interactiveCmd() {
@@ -222,7 +231,4 @@ class CliInterface {
 
 module.exports = {
   CliInterface,
-  camelCaseToKebab,
-  kebabCaseToCamel,
-  promptInput,
 };
