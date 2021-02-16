@@ -3,6 +3,11 @@ const prompt = inquirer.createPromptModule();
 
 module.exports = {
   /**
+   * Converts camelCase to kebas-case
+   * @param {string} str String to be converted to kebab-case
+   */
+  camelCaseToKebab: (str) => str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase(),
+  /**
    * Converts kebab-case to camelCase
    * @param {string} str String to be converted to camelCase
    */

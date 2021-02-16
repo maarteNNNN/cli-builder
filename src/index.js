@@ -1,9 +1,66 @@
+const { format } = require('util');
 const argv = require('minimist')(process.argv.slice(2));
-const { kebabCaseToCamel, promptInput } = require('./lib');
+const { kebabCaseToCamel, promptInput, camelCaseToKebab } = require('./lib');
 
 class CliInterface {
+  constructor() {
+    this.helpArray = [];
+  }
+
+  logHelpCommands() {
+    if (this.options.helpHeader) console.log(this.options.helpHeader);
+
+    this.helpArray.forEach(({ command, description }) => {
+      console.log(
+        `${command} ${command.split(' ').map(() => '\t')} ${description}`,
+      );
+    });
+
+    if (this.options.helpFooter) console.log(this.options.helpFooter);
+
+    this.helpArray = [];
+  }
+
+  // TODO: Get previous values
+  getHelpCommands(accumulator, commands, previousValue = null) {
+    const keys = Object.keys(accumulator);
+
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      const currentValue = accumulator[key];
+
+      if (
+        (typeof currentValue === 'string' && key === 'help') ||
+        (typeof currentValue === 'function' && key !== 'execute')
+      ) {
+        // previousValue = camelCaseToKebab(previousValue);
+        // bind for the helpLog function to take
+        this.helpArray.push({
+          // Add the command if is array join it eg. `some deep nested command` or key as string when it is in the root object
+          command: Array.isArray(previousValue)
+            ? previousValue.join(' ')
+            : camelCaseToKebab(key),
+          description:
+            typeof currentValue === 'function'
+              ? 'No description available'
+              : currentValue,
+        });
+      } else {
+        // Mount an array to get previous commands to display it nicely eg. `some deep nested command`
+        const previousValues = previousValue
+          ? Array.isArray(previousValue)
+            ? [...previousValue, camelCaseToKebab(key)]
+            : [camelCaseToKebab(previousValue), camelCaseToKebab(key)]
+          : [camelCaseToKebab(key)];
+
+        this.getHelpCommands(currentValue, commands, previousValues);
+      }
+    }
+  }
+
   /**
-   * Instantiates a cli interface
+   * Runs the cli interface
+   * @param {Object} commands Command object with function to execute
    * @param {Object} options options
    * @param {string} options.command Command to put in logs
    * @param {boolean} options.enableInteractive Allow interactive mode
@@ -12,10 +69,10 @@ class CliInterface {
    * @param {Promise} options.afterCommandFn Function to execute after initialization
    * @param {string} options.helpHeader Header to show in help
    * @param {string} options.helpFooter Footer to show in help
-   * @param {Object} commands Command object with function to execute
    */
-  constructor(options, commands) {
-    this.options = options || {};
+  async run(commands = {}, options = {}) {
+    // OPTIONS
+    this.options = options;
 
     if (!this.options.enableInteractive) this.options.enableInteractive = true;
 
@@ -42,37 +99,8 @@ class CliInterface {
       }
     }
 
-    this.helpArray = [];
-  }
-
-  logHelpCommands() {
-    if (this.options.helpHeader) console.log(this.options.helpHeader);
-
-    for (let i = 0; i < this.helpArray.length; i++) {
-      this.helpArray[i]();
-    }
-
-    if (this.options.helpFooter) console.log(this.options.helpFooter);
-
-    this.helpArray = [];
-  }
-
-  getHelpCommands(object) {
-    const accumulator = object;
-    const keys = Object.keys(object);
-
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      const currentValue = accumulator[key];
-
-      if (typeof currentValue === 'function' && key === 'help')
-        this.helpArray.push(currentValue);
-      else this.getHelpCommands(currentValue);
-    }
-  }
-
-  async run(commands) {
-    this.commands = commands || {};
+    // COMMANDS
+    this.commands = commands;
 
     this.commands = {
       ...this.commands,
@@ -80,12 +108,13 @@ class CliInterface {
         const commands = this.commands;
         delete commands.help;
 
-        this.getHelpCommands(commands);
+        this.getHelpCommands(commands, commands);
 
         this.logHelpCommands();
       },
     };
 
+    // EXECUTE CLI
     // Function to run before initialization
     if (this.options.beforeCommandFn && !this.exception)
       await this.options.beforeCommandFn();
@@ -129,7 +158,7 @@ class CliInterface {
           commands.length - 1 === i &&
           commands.length !== 1
         ) {
-          this.getHelpCommands(accumulator);
+          this.getHelpCommands(accumulator, commands);
           this.logHelpCommands();
           return;
         }
@@ -195,6 +224,7 @@ class CliInterface {
 
 module.exports = {
   CliInterface,
+  camelCaseToKebab,
   kebabCaseToCamel,
   promptInput,
 };
