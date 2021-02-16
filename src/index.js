@@ -59,8 +59,16 @@ class CliInterface {
     if (this.options.helpHeader) console.log(this.options.helpHeader);
 
     this.helpArray.forEach(({ command, description }) => {
+      const commandCharacterCount = command.length;
+      const size = 100 - commandCharacterCount;
+      let spaces = ''
+
+      for (let i = 0; i < size; i++) {
+        spaces = spaces + ' ';
+      }
+
       console.log(
-        `${command} ${command.split(' ').map(() => '\t')} ${description}`,
+        `${command} ${spaces} ${description}`,
       );
     });
 
@@ -110,7 +118,7 @@ class CliInterface {
    */
   async run(commands = {}) {
     // BIND ARGS TO FUNCTIONS
-    if(this.options.actions) {
+    if (this.options.actions) {
       for (let i = 0; i < Object.keys(this.options.actions).length; i++) {
         const key = Object.keys(this.options.actions)[i];
         this.actions[key] = this.options.actions[key].bind(
