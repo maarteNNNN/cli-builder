@@ -37,19 +37,19 @@ an example of commands is shown below
 const commands = {
   test: {
     execute: () => console.log('this is the test run'),
-    help: () => console.log('help of test'),
+    help: 'help of test',
     testing: {
       execute: () => console.log('executing testing'),
-      help: () => console.log('testing help'),
+      help: 'testing help',
     },
     testing2: {
       execute: () => console.log('executing testing2'),
-      help: () => console.log('testing2 help'),
+      help: 'testing2 help'),
     },
   },
   test2: {
     execute: () => console.log('this is the test2 run'),
-    help: () => console.log('help of test2'),
+    help: 'help of test2',
   },
   deep: {
     nesting: {
