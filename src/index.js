@@ -260,19 +260,20 @@ class CliInterface {
   };
 
   /**
-   * 
+   *
    * @param {any} output What info will be outputted through the `successLog` method
    * @param {Object} pageInfo Info about the page
    * @param {Number} pageInfo.offset Offset of the query
    * @param {Number} pageInfo.limit Limit of the query
    * @param {Number} pageInfo.pageNumber Number of the current page
+   * @param {Number} pageInfo.order Order to run the query
    * @param {Number} increments Increments on offset en limit
    * @param {Function} fn Function to execute while keeping page interactive
    * @param {Array<string>} args Arguments to pass through that function
    */
   async pagination(
     output,
-    pageInfo = { offset: 1, limit: 1, pageNumber: 1 },
+    pageInfo = { offset: 1, limit: 1, pageNumber: 1, order: 'ASC' },
     increments = 1,
     fn = () => {},
     args = [],
@@ -297,6 +298,8 @@ class CliInterface {
         return Promise.resolve('p');
       } else if (['n', 'next'].includes(paginationInput)) {
         return Promise.resolve('n');
+      } else if (['o', 'order'].includes(paginationInput)) {
+        return Promise.resolve('o');
       } else if (['h', 'help'].includes(paginationInput)) {
         console.log('previous (p)   -- to go to the previous page');
         console.log('next (n)       -- to go to the next page');
@@ -318,12 +321,14 @@ class CliInterface {
       pageInfo.offset -= increments;
       pageInfo.limit -= increments;
       pageInfo.pageNumber--;
+    } else if (action === 'o') {
+      pageInfo.order === 'ASC' ? 'DESC' : 'ASC';
     }
 
     if (action !== 'q') {
       return await fn.call(this, ...args);
     } else {
-      return this.successLog('Exiting pagination...')
+      return this.successLog('Exiting pagination...');
     }
   }
 }
