@@ -1,5 +1,11 @@
 const argv = require('minimist')(process.argv.slice(2));
-const { kebabCaseToCamel, promptInput, camelCaseToKebab } = require('./lib');
+const {
+  kebabCaseToCamel,
+  promptInput,
+  camelCaseToKebab,
+  constants,
+  keyPress,
+} = require('./lib');
 
 // TODO: Implement an automatic help header with interactive and non-interactive usage, when using help non-interactivaly
 // TODO: Align columns in help
@@ -53,6 +59,12 @@ class CliInterface {
     this.camelCaseToKebab = camelCaseToKebab;
     this.kebabCaseToCamel = kebabCaseToCamel;
     this.promptInput = promptInput;
+    this.keyPress = keyPress;
+
+    // CONSTANTS
+    this.constants = constants;
+
+    this.paginationActive = false;
   }
 
   logHelpCommands() {
@@ -61,15 +73,13 @@ class CliInterface {
     this.helpArray.forEach(({ command, description }) => {
       const commandCharacterCount = command.length;
       const size = 100 - commandCharacterCount;
-      let spaces = ''
+      let spaces = '';
 
       for (let i = 0; i < size; i++) {
         spaces = spaces + ' ';
       }
 
-      console.log(
-        `${command} ${spaces} ${description}`,
-      );
+      console.log(`${command} ${spaces} ${description}`);
     });
 
     if (this.options.helpFooter) console.log(this.options.helpFooter);
@@ -244,8 +254,78 @@ class CliInterface {
   }
 
   exit = async (code = 0, override = false) => {
-    if (!this.options.interactive || override) process.exit(code);
+    if (this.options.interactive && !override) return;
+    if (this.paginationActive) return;
+    process.exit(code);
   };
+
+  /**
+   * 
+   * @param {any} output What info will be outputted through the `successLog` method
+   * @param {Object} pageInfo Info about the page
+   * @param {Number} pageInfo.offset Offset of the query
+   * @param {Number} pageInfo.limit Limit of the query
+   * @param {Number} pageInfo.pageNumber Number of the current page
+   * @param {Number} increments Increments on offset en limit
+   * @param {Function} fn Function to execute while keeping page interactive
+   * @param {Array<string>} args Arguments to pass through that function
+   */
+  async pagination(
+    output,
+    pageInfo = { offset: 1, limit: 1, pageNumber: 1 },
+    increments = 1,
+    fn = () => {},
+    args = [],
+  ) {
+    // To use in exit for it not to
+    this.paginationActive = true;
+
+    console.clear();
+    this.successLog(output, false);
+    console.log(
+      `Paged output: previous (p)        ${pageInfo.pageNumber}         next (n)`,
+    );
+    console.log(`Quit (q)`);
+    const actionPrompt = async () => {
+      const paginationInput = await promptInput('>');
+      if (paginationInput === '') {
+        actionPrompt();
+      } else if (['q', 'quit', 'exit'].includes(paginationInput)) {
+        this.paginationActive = false;
+        return Promise.resolve('q');
+      } else if (['p', 'previous', 'back'].includes(paginationInput)) {
+        return Promise.resolve('p');
+      } else if (['n', 'next'].includes(paginationInput)) {
+        return Promise.resolve('n');
+      } else if (['h', 'help'].includes(paginationInput)) {
+        console.log('previous (p)   -- to go to the previous page');
+        console.log('next (n)       -- to go to the next page');
+        console.log('quit (q)       -- to stop browsing the pages');
+        actionPrompt();
+      } else {
+        this.errorLog('Input not recognized');
+        actionPrompt();
+      }
+    };
+
+    const action = await actionPrompt();
+
+    if (action === 'n') {
+      pageInfo.offset += increments;
+      pageInfo.limit += increments;
+      pageInfo.pageNumber++;
+    } else if (action === 'p' && pageInfo.pageNumber !== 1) {
+      pageInfo.offset -= increments;
+      pageInfo.limit -= increments;
+      pageInfo.pageNumber--;
+    }
+
+    if (action !== 'q') {
+      return await fn.call(this, ...args);
+    } else {
+      return this.successLog('Exiting pagination...')
+    }
+  }
 }
 
 module.exports = {
