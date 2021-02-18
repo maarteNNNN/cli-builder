@@ -160,7 +160,7 @@ class CliInterface {
   }
 
   async interactiveCmd() {
-    const command = await promptInput('interactive command >');
+    const command = await promptInput('>');
     await this.execCmd(command);
   }
 
@@ -195,8 +195,11 @@ class CliInterface {
           return;
         }
 
-        if (typeof accumulator.execute === 'function' && !currentValue)
-          return await accumulator.execute();
+        if (typeof accumulator.execute === 'function' && !currentValue) {
+          await accumulator.execute();
+          this.interactiveCmd();
+          return
+        }
 
         if (currentValue) {
           if (accumulator.hasOwnProperty(currentValue)) {
