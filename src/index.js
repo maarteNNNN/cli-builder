@@ -9,7 +9,7 @@ const {
 
 // TODO: Implement an automatic help header with interactive and non-interactive usage, when using help non-interactivaly
 // TODO: Align columns in help
-class CliInterface {
+class REPLClient {
   /**
    * Instanciate the cli
    * @param {Object} options options
@@ -337,5 +337,5 @@ class CliInterface {
 }
 
 module.exports = {
-  CliInterface,
+  REPLClient,
 };
