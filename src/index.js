@@ -197,7 +197,7 @@ class CliInterface {
 
         if (typeof accumulator.execute === 'function' && !currentValue) {
           await accumulator.execute();
-          this.interactiveCmd();
+          await this.interactiveCmd();
           return
         }
 
@@ -276,7 +276,7 @@ class CliInterface {
    */
   async pagination(
     output,
-    pageInfo = { offset: 1, limit: 1, pageNumber: 1, order: 'ASC' },
+    pageInfo = { offset: 1, limit: 1, pageNumber: 1, order: 'asc' },
     increments = 1,
     fn = () => {},
     args = [],
@@ -307,10 +307,10 @@ class CliInterface {
         console.log('previous (p)   -- to go to the previous page');
         console.log('next (n)       -- to go to the next page');
         console.log('quit (q)       -- to stop browsing the pages');
-        actionPrompt();
+        await actionPrompt();
       } else {
         this.errorLog('Input not recognized');
-        actionPrompt();
+        await actionPrompt();
       }
     };
 
@@ -325,7 +325,7 @@ class CliInterface {
       pageInfo.limit -= increments;
       pageInfo.pageNumber--;
     } else if (action === 'o') {
-      pageInfo.order === 'ASC' ? 'DESC' : 'ASC';
+      pageInfo.order === 'asc' ? 'desc' : 'asc';
     }
 
     if (action !== 'q') {
