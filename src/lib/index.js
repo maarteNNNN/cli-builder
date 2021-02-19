@@ -30,4 +30,25 @@ module.exports = {
     ]);
     return answer.result;
   },
+
+  /**
+   * Confirmation Prompt
+   * @param {string} message Message of confirmation
+   * @param {Object} options
+   * @param {any} options.default Default of confirmation
+   */
+  promptConfirm: async function (message, options) {
+    const promptOptions = {
+      type: 'confirm',
+      message,
+      name: 'result',
+    };
+
+    if (options && options.default) {
+      promptOptions.default = options.default;
+    }
+
+    const answers = await prompt([promptOptions]);
+    return answers.result;
+  },
 };

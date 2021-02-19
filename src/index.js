@@ -2,6 +2,7 @@ const argv = require('minimist')(process.argv.slice(2));
 const {
   kebabCaseToCamel,
   promptInput,
+  confirmationPrompt,
   camelCaseToKebab,
   constants,
   keyPress,
@@ -18,9 +19,11 @@ class REPLClient {
    * @param {string} options.helpHeader Header to show in help
    * @param {string} options.helpFooter Footer to show in help
    * @param {string} options.binCommand If error it will show how to access the help command
+   * @param {string} options.argv Manually pass arguments to cli (used for testing)
    */
   constructor(options = {}) {
-    this.argv = argv;
+    if (process.env.NODE_ENV !== 'testing') this.argv = argv;
+    else this.argv = options.argv;
 
     // OPTIONS
     this.options = options;
@@ -28,9 +31,9 @@ class REPLClient {
     if (!this.options.enableInteractive) this.options.enableInteractive = true;
 
     this.options.interactive =
-      (!argv._.length || Object.keys(argv).length > 1) &&
+      (!this.argv._.length || Object.keys(this.argv).length > 1) &&
       // Case its --help, --version or -v
-      !Object.keys(argv).slice(1).length &&
+      !Object.keys(this.argv).slice(1).length &&
       this.options.enableInteractive;
 
     if (!this.options.command) this.options.command = '';
@@ -45,7 +48,7 @@ class REPLClient {
     // Check if has exceptions, this is only executed when not interactive
     for (let i = 0; i < this.options.exceptions.length; i++) {
       const exception = this.options.exceptions[i];
-      if (argv.hasOwnProperty(exception)) {
+      if (this.argv.hasOwnProperty(exception)) {
         this.options.exception = true;
       }
     }
@@ -59,6 +62,7 @@ class REPLClient {
     this.camelCaseToKebab = camelCaseToKebab;
     this.kebabCaseToCamel = kebabCaseToCamel;
     this.promptInput = promptInput;
+    this.confirmationPrompt = confirmationPrompt;
     this.keyPress = keyPress;
 
     // CONSTANTS
@@ -73,7 +77,7 @@ class REPLClient {
     this.helpArray.forEach(
       ({ command, description, options = null, input = null }) => {
         const commandCharacterCount =
-          command.length + (input ? input.length : - 1);
+          command.length + (input ? input.length : -1);
         const size = 100 - commandCharacterCount;
 
         console.log(
@@ -191,7 +195,7 @@ class REPLClient {
   }
 
   async commandCmd() {
-    const command = [].concat(argv._, Object.keys(argv).slice(1));
+    const command = [].concat(this.argv._, Object.keys(this.argv).slice(1));
     await this.execCmd(command);
   }
 
@@ -223,19 +227,26 @@ class REPLClient {
 
         if (typeof accumulator.execute === 'function' && !currentValue) {
           await accumulator.execute();
-          await this.interactiveCmd();
-          return;
+          if (this.options.interactive) {
+            await this.interactiveCmd();
+            return;
+          }
         }
 
         if (currentValue) {
           if (accumulator.hasOwnProperty(currentValue)) {
             accumulator = accumulator[currentValue];
             if (typeof accumulator === 'function') await accumulator();
-          } else if (typeof accumulator[currentValue] === 'function')
-            await accumulator[currentValue]();
+          }
+          // else if (typeof accumulator[currentValue] === 'function')
+          //    await accumulator[currentValue]();
           else if (typeof accumulator['--' + currentValue] === 'function')
             await accumulator['--' + currentValue]();
           else {
+            if (typeof accumulator.execute === 'function') {
+              await accumulator.execute.call(this, currentValue);
+              return;
+            }
             throw new Error('command invalid');
           }
         }
