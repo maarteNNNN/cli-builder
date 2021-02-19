@@ -11,7 +11,7 @@ npm install cli-builder
 
 Take a look at `bin/example-cli.js`
 
-Instantiate CLI with `new CliInterface({ ...options })`
+Instantiate CLI with `new REPLClient({ ...options })`
 
 - `options.command` - Type: `string` Command to put in logs
 - `options.enableInteractive` - Type: `boolean` Allow interactive mode
