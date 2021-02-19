@@ -70,29 +70,46 @@ class REPLClient {
   logHelpCommands() {
     if (this.options.helpHeader) console.log(this.options.helpHeader);
 
-    this.helpArray.forEach(({ command, description }) => {
-      const commandCharacterCount = command.length;
-      const size = 100 - commandCharacterCount;
-      let spaces = '';
+    this.helpArray.forEach(
+      ({ command, description, options = null, input = null }) => {
+        const commandCharacterCount =
+          command.length + (input ? input.length : - 1);
+        const size = 100 - commandCharacterCount;
 
-      for (let i = 0; i < size; i++) {
-        spaces = spaces + ' ';
-      }
-
-      console.log(`${command} ${spaces} ${description}`);
-    });
+        console.log(
+          `${command}${input ? ' ' + input : ''} ${Array(size)
+            .fill(' ')
+            .join('')} ${description}`,
+        );
+        if (Array.isArray(options)) {
+          for (let i = 0; i < options.length; i++) {
+            const { option, help } = options[i];
+            const optionSize = 100 - option.length - 3;
+            console.log(
+              `   -${option} ${Array(optionSize).fill(' ').join('')} ${help}`,
+            );
+          }
+        }
+      },
+    );
 
     if (this.options.helpFooter) console.log(this.options.helpFooter);
 
     this.helpArray = [];
   }
 
-  getHelpCommands(accumulator, commands, previousValue = null) {
+  getHelpCommands(
+    accumulator,
+    commands,
+    previousValue = null,
+    previousAccumulator = null,
+  ) {
     const keys = Object.keys(accumulator);
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       const currentValue = accumulator[key];
+      previousAccumulator = accumulator;
 
       if (
         (typeof currentValue === 'string' && key === 'help') ||
@@ -102,22 +119,31 @@ class REPLClient {
         this.helpArray.push({
           // Add the command if is array join it eg. `some deep nested command` or key as string when it is in the root object
           command: Array.isArray(previousValue)
-            ? previousValue.join(' ')
+            ? camelCaseToKebab(previousValue.join(' '))
             : camelCaseToKebab(key),
           description:
             typeof currentValue === 'function'
               ? 'No description available'
               : currentValue,
+          options: previousAccumulator.options,
+          input: previousAccumulator.input,
         });
       } else {
         // Mount an array to get previous commands to display it nicely eg. `some deep nested command`
-        const previousValues = previousValue
-          ? Array.isArray(previousValue)
-            ? [...previousValue, camelCaseToKebab(key)]
-            : [camelCaseToKebab(previousValue), camelCaseToKebab(key)]
-          : [camelCaseToKebab(key)];
+        if (key !== 'options' && key !== 'input') {
+          const previousValues = previousValue
+            ? Array.isArray(previousValue)
+              ? [...previousValue, key]
+              : [previousValue, key]
+            : [key];
 
-        this.getHelpCommands(currentValue, commands, previousValues);
+          this.getHelpCommands(
+            currentValue,
+            commands,
+            previousValues,
+            previousAccumulator,
+          );
+        }
       }
     }
   }
@@ -198,7 +224,7 @@ class REPLClient {
         if (typeof accumulator.execute === 'function' && !currentValue) {
           await accumulator.execute();
           await this.interactiveCmd();
-          return
+          return;
         }
 
         if (currentValue) {
@@ -218,6 +244,7 @@ class REPLClient {
       if (e.message === 'command invalid') {
         this.invalidCommand();
       } else {
+        debugger;
         this.errorLog(e.message);
       }
     }
