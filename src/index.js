@@ -244,7 +244,10 @@ class REPLClient {
             await accumulator['--' + currentValue]();
           else {
             if (typeof accumulator.execute === 'function') {
-              await accumulator.execute.call(this, currentValue);
+              await accumulator.execute.call(
+                this,
+                camelCaseToKebab(currentValue),
+              );
               return;
             }
             throw new Error('command invalid');
@@ -263,7 +266,7 @@ class REPLClient {
     if (this.options.interactive) this.interactiveCmd();
   }
 
-  successLog(successMsg, prefix = '') {
+  successLog(successMsg, prefix = '', noExit = false) {
     successMsg =
       typeof successMsg === 'object'
         ? JSON.stringify(successMsg, null, 2)
@@ -276,11 +279,13 @@ class REPLClient {
         prefix && prefix.length && '\n'
       }${successMsg}\x1b[0m`,
     );
+    if (noExit) return;
     this.exit(0);
   }
 
-  errorLog(errorMsg, code = null) {
+  errorLog(errorMsg, code = null, noExit = false) {
     console.log(`\x1b[1m\x1b[31mError: ${errorMsg}\x1b[0m`);
+    if (noExit) return;
     this.exit(code || 1);
   }
 
