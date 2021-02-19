@@ -2,7 +2,7 @@ const argv = require('minimist')(process.argv.slice(2));
 const {
   kebabCaseToCamel,
   promptInput,
-  confirmationPrompt,
+  promptConfirm,
   camelCaseToKebab,
   constants,
   keyPress,
@@ -62,7 +62,7 @@ class REPLClient {
     this.camelCaseToKebab = camelCaseToKebab;
     this.kebabCaseToCamel = kebabCaseToCamel;
     this.promptInput = promptInput;
-    this.confirmationPrompt = confirmationPrompt;
+    this.promptConfirm = promptConfirm;
     this.keyPress = keyPress;
 
     // CONSTANTS
@@ -279,9 +279,9 @@ class REPLClient {
     this.exit(0);
   }
 
-  errorLog(errorMsg) {
+  errorLog(errorMsg, code = null) {
     console.log(`\x1b[1m\x1b[31mError: ${errorMsg}\x1b[0m`);
-    this.exit(1);
+    this.exit(code || 1);
   }
 
   invalidCommand() {
