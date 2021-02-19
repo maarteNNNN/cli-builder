@@ -1,7 +1,19 @@
 # CLI-Builder
 
-This builds cli's very quickly.
+This builds cli's very quickly.<br />
 This is a WIP. As are the docs.
+
+##
+
+- Document `options` inside a command
+- Document `this.argv`
+- Document `input` inside a command
+- Add a way to give params to the function
+- Document the `pagination` function
+- Add `promptConfirm` to docs
+- Write tests for some functions within the REPL Client
+- document `noExit` for `succesLog` and `errorLog`
+- add `warningLog`
 
 ## Installing
 
@@ -25,7 +37,7 @@ and
 and running with
 
 ```js
-cli.run(commands)
+cli.run(commands);
 ```
 
 an example of commands is shown below
@@ -123,12 +135,12 @@ using `cli-builder an-action-test` will execute the `getUserData` function with 
 
 - `CmdInterface.run(commands)` type: `function` - Initiates the interface interactivaly or non-interactivaly depending on the arguments given.
 - `CmdInterface.exit(code, override)` type: `function` - Exits the process
-    - **Param:** `code` type `number` - exit code same as `process.exit`
-    - **Param:** `override` type `boolean` - this is to override exit if in interactive mode
+  - **Param:** `code` type `number` - exit code same as `process.exit`
+  - **Param:** `override` type `boolean` - this is to override exit if in interactive mode
 - `CmdInterface.invalidCommand()` type: `function` - This is to run and pre-defined `errorLog` with a `console.log` to write help to the command line
-- `CmdInterface.errorLog(errorMsg)` type: `function` 
-    - **Param:** `errorMsg` type `string` - String to log as an error (colored in red)
-- `CmdInterface.successLog(successMsg, prefix = '')` type: `function` 
+- `CmdInterface.errorLog(errorMsg)` type: `function`
+  - **Param:** `errorMsg` type `string` - String to log as an error (colored in red)
+- `CmdInterface.successLog(successMsg, prefix = '')` type: `function`
   - **Param:** `successMsg` type `string` - String to log as an success (colored in green)
   - **Param:** `prefix` type `string` default `''` - String to show before the message followed by a break-line
 - `CmdInterface.execCmd(cmd)` type: `function` - Executes an `array` or `string` of commands
@@ -139,12 +151,12 @@ using `cli-builder an-action-test` will execute the `getUserData` function with 
 ### Helper functions
 
 - `CmdInterface.promptInput(message, secret)` type: `function` - Prompts an input and returns the given value
-    - **Param:** `message` type `string` - Message to be prompted
-    - **Param:** `secret` type `boolean` - Hide input provided by user (useful for passwords)
-    - **Returns:** type `Promise<string>` - Returns input written by the user
+  - **Param:** `message` type `string` - Message to be prompted
+  - **Param:** `secret` type `boolean` - Hide input provided by user (useful for passwords)
+  - **Returns:** type `Promise<string>` - Returns input written by the user
 - `CmdInterface.kebabCaseToCamel(str)` type: `function` - Converts string
-    - **Param:** `str` type `string` - String to be converted to camelCase
-    - **Returns:** type `string` - Returns converted string
+  - **Param:** `str` type `string` - String to be converted to camelCase
+  - **Returns:** type `string` - Returns converted string
 - `CmdInterface.camelCaseToKebab(str)` type: `function` - Converts string
-    - **Param:** `str` type `string` - String to be converted to kebab-case
-    - **Returns:** type `string` - Returns converted string
+  - **Param:** `str` type `string` - String to be converted to kebab-case
+  - **Returns:** type `string` - Returns converted string
