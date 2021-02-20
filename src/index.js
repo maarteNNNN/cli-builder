@@ -220,17 +220,6 @@ class REPLClient {
           ? kebabCaseToCamel(commands[i + 1])
           : null;
 
-        if (
-          (currentValue === 'help' || currentValue === '--help') &&
-          commands.length - 1 === i &&
-          commands.length !== 1
-        ) {
-          this.getHelpCommands(accumulator, commands);
-          this.logHelpCommands();
-          if (this.options.interactive) await this.interactiveCmd();
-          return;
-        }
-
         if (typeof accumulator.execute === 'function' && !currentValue) {
           await accumulator.execute();
           if (this.options.interactive) {
@@ -247,8 +236,6 @@ class REPLClient {
             else if (!accumulator.hasOwnProperty(nextValue))
               throw new Error('command is invalid and needs more arguments');
           }
-          // else if (typeof accumulator[currentValue] === 'function')
-          //    await accumulator[currentValue]();
           else if (typeof accumulator['--' + currentValue] === 'function')
             await accumulator['--' + currentValue]();
           else {
@@ -262,9 +249,6 @@ class REPLClient {
             throw new Error('command invalid');
           }
         }
-      }
-      if (this.options.interactive) {
-        await this.interactiveCmd();
       }
     } catch (e) {
       if (e.message === 'command invalid') {

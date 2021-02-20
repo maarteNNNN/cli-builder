@@ -12,7 +12,7 @@ module.exports = {
    * Converts kebab-case to camelCase
    * @param {string} str String to be converted to camelCase
    */
-  kebabCaseToCamel: (str) => str.replace(/-./g, (x) => x.toUpperCase()[1]),
+  kebabCaseToCamel: (str) => str.includes('--') ? str.replace('--', '') : str.replace(/-./g, (x) => x.toUpperCase()[1]),
   /**
    * Prompt wrapper function
    * @param {string} message Prompt message
