@@ -175,11 +175,14 @@ class REPLClient {
       ...this.commands,
       help: async () => {
         const commands = this.commands;
-        delete commands.help;
+        const { help } = this.commands;
+        delete this.commands.help;
 
         this.getHelpCommands(commands, commands);
 
         this.logHelpCommands();
+
+        this.commands.help = help;
       },
     };
 
