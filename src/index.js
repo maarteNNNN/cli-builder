@@ -230,6 +230,17 @@ class REPLClient {
           }
         }
 
+        if (
+          (currentValue === 'help' || currentValue === '--help') &&
+          commands.length - 1 === i &&
+          commands.length !== 1
+        ) {
+          this.getHelpCommands(accumulator, commands);
+          this.logHelpCommands();
+          if (this.options.interactive) await this.interactiveCmd();
+          return;
+        }
+
         if (currentValue) {
           if (accumulator.hasOwnProperty(currentValue)) {
             accumulator = accumulator[currentValue];
@@ -280,7 +291,7 @@ class REPLClient {
   }
 
   errorLog(errorMsg, code = null, noExit = false) {
-    if(this.testing) throw new Error(errorMsg)
+    if (this.testing) throw new Error(errorMsg);
     console.log(`\x1b[1m\x1b[31mError: ${errorMsg}\x1b[0m`);
     if (noExit) return;
     this.exit(code || 1);

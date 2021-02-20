@@ -128,7 +128,7 @@ describe('REPL Client tests', () => {
     }
   });
 
-  it('it should run help with options', async () => {
+  it('it should run help with options as -- argument', async () => {
     try {
       const testCli = await initiateCli(exampleOptions, {
         _: ['command'],
@@ -152,7 +152,31 @@ describe('REPL Client tests', () => {
     }
   });
 
-  it('it should run help with options', async () => {
+  it('it should run help with options as non -- argument', async () => {
+    try {
+      const testCli = await initiateCli(exampleOptions, {
+        _: ['command'],
+        help: true,
+      });
+
+      const commands = {
+        command: {
+          execute: () => {},
+          help: 'Testing this help',
+          options: [
+            { option: 'v', help: 'version displayed' },
+            { option: 's', help: 'version displayed' },
+          ],
+        },
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai.expect(e).to.not.throw();
+    }
+  });
+
+  it('it should run help with input', async () => {
     try {
       const testCli = await initiateCli(exampleOptions, {
         _: ['command'],
@@ -185,7 +209,7 @@ describe('REPL Client tests', () => {
       const commands = {
         paramt: {
           execute: (test) => {
-            chai.expect(test).to.be.eql(param)
+            chai.expect(test).to.be.eql(param);
           },
           help: 'Testing this help',
           input: '<app-name>',
