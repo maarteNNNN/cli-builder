@@ -25,6 +25,8 @@ class REPLClient {
     if (process.env.NODE_ENV !== 'testing') this.argv = argv;
     else this.argv = options.argv;
 
+    this.testing = process.env.NODE_ENV === 'testing';
+
     // OPTIONS
     this.options = options;
 
@@ -235,8 +237,7 @@ class REPLClient {
             else if (typeof accumulator.execute === 'function') continue;
             else if (!accumulator.hasOwnProperty(nextValue))
               throw new Error('command is invalid and needs more arguments');
-          }
-          else if (typeof accumulator['--' + currentValue] === 'function')
+          } else if (typeof accumulator['--' + currentValue] === 'function')
             await accumulator['--' + currentValue]();
           else {
             if (typeof accumulator.execute === 'function') {
@@ -279,6 +280,7 @@ class REPLClient {
   }
 
   errorLog(errorMsg, code = null, noExit = false) {
+    if(this.testing) throw new Error(errorMsg)
     console.log(`\x1b[1m\x1b[31mError: ${errorMsg}\x1b[0m`);
     if (noExit) return;
     this.exit(code || 1);
@@ -297,6 +299,7 @@ class REPLClient {
   exit = async (code = 0, override = false) => {
     if (this.options.interactive && !override) return;
     if (this.paginationActive) return;
+    if (this.testing) return;
     process.exit(code);
   };
 
