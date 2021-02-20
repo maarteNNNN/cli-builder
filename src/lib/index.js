@@ -51,4 +51,12 @@ module.exports = {
     const answers = await prompt([promptOptions]);
     return answers.result;
   },
+
+    /**
+   * Checks if an object has children
+   * @param {Object} obj Any object to check
+   */
+  hasChild(obj) {
+    return !!Object.keys(obj).length;
+  }
 };

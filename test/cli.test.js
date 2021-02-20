@@ -175,16 +175,18 @@ describe('REPL Client tests', () => {
 
   it('it should pass a parameter', async () => {
     try {
-      const param = 'this should be passed as a parameter';
+      const param = 'argument';
 
       const testCli = await initiateCli(exampleOptions, {
-        _: ['command', param],
+        _: ['paramt', param],
         help: true,
       });
 
       const commands = {
-        command: {
-          execute: (test) => chai.expect(test).to.be.eql(param),
+        paramt: {
+          execute: (test) => {
+            chai.expect(test).to.be.eql(param)
+          },
           help: 'Testing this help',
           input: '<app-name>',
         },

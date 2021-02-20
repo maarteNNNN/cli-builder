@@ -3,17 +3,20 @@
 This builds cli's very quickly.<br />
 This is a WIP. As are the docs.
 
-##
+## Todo
 
-- Document `options` inside a command
-- Document `this.argv`
-- Document `input` inside a command
-- Add a way to give params to the function
-- Document the `pagination` function
-- Add `promptConfirm` to docs
-- Write tests for some functions within the REPL Client
-- document `noExit` for `succesLog` and `errorLog`
-- add `warningLog`
+- [ ] Document `options` inside a command
+- [ ] Document `this.argv`
+- [ ] Document `input` inside a command
+- [ ] Add a way to give params to the function
+- [ ] Document the `pagination` function
+- [ ] Add `promptConfirm` to docs
+- [ ] Write tests for some functions within the REPL Client
+- [ ] document `noExit` for `succesLog` and `errorLog`
+- [ ] add `warningLog`
+- [x] FIXED `0.0.11`: Interactivaly using help works only once
+- [x] When command is incomplete it should throw an error
+- [ ] Document usage of `--` commands
 
 ## Installing
 

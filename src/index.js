@@ -6,10 +6,10 @@ const {
   camelCaseToKebab,
   constants,
   keyPress,
+  hasChild,
 } = require('./lib');
 
 // TODO: Implement an automatic help header with interactive and non-interactive usage, when using help non-interactivaly
-// TODO: Align columns in help
 class REPLClient {
   /**
    * Instanciate the cli
@@ -213,6 +213,9 @@ class REPLClient {
 
       for (let i = 0; i < commands.length + 1; i++) {
         const currentValue = commands[i] ? kebabCaseToCamel(commands[i]) : null;
+        const nextValue = commands[i + 1]
+          ? kebabCaseToCamel(commands[i + 1])
+          : null;
 
         if (
           (currentValue === 'help' || currentValue === '--help') &&
@@ -237,6 +240,9 @@ class REPLClient {
           if (accumulator.hasOwnProperty(currentValue)) {
             accumulator = accumulator[currentValue];
             if (typeof accumulator === 'function') await accumulator();
+            else if (typeof accumulator.execute === 'function') continue;
+            else if (!accumulator.hasOwnProperty(nextValue))
+              throw new Error('command is invalid and needs more arguments');
           }
           // else if (typeof accumulator[currentValue] === 'function')
           //    await accumulator[currentValue]();
@@ -254,11 +260,13 @@ class REPLClient {
           }
         }
       }
+      if (this.options.interactive) {
+        await this.interactiveCmd();
+      }
     } catch (e) {
       if (e.message === 'command invalid') {
         this.invalidCommand();
       } else {
-        debugger;
         this.errorLog(e.message);
       }
     }
