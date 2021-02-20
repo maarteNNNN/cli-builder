@@ -246,6 +246,7 @@ class REPLClient {
             accumulator = accumulator[currentValue];
             if (typeof accumulator === 'function') await accumulator();
             else if (typeof accumulator.execute === 'function') continue;
+            else if (nextValue === 'help') continue
             else if (!accumulator.hasOwnProperty(nextValue))
               throw new Error('command is invalid and needs more arguments');
           } else if (typeof accumulator['--' + currentValue] === 'function')
