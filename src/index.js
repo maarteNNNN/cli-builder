@@ -6,7 +6,7 @@ const {
   camelCaseToKebab,
   constants,
   keyPress,
-  hasChild,
+  promptList,
 } = require('./lib');
 
 // TODO: Implement an automatic help header with interactive and non-interactive usage, when using help non-interactivaly
@@ -65,6 +65,7 @@ class REPLClient {
     this.kebabCaseToCamel = kebabCaseToCamel;
     this.promptInput = promptInput;
     this.promptConfirm = promptConfirm;
+    this.promptList = promptList;
     this.keyPress = keyPress;
 
     // CONSTANTS

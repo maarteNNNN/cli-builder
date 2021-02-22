@@ -12,7 +12,10 @@ module.exports = {
    * Converts kebab-case to camelCase
    * @param {string} str String to be converted to camelCase
    */
-  kebabCaseToCamel: (str) => str.includes('--') ? str.replace('--', '') : str.replace(/-./g, (x) => x.toUpperCase()[1]),
+  kebabCaseToCamel: (str) =>
+    str.includes('--')
+      ? str.replace('--', '')
+      : str.replace(/-./g, (x) => x.toUpperCase()[1]),
   /**
    * Prompt wrapper function
    * @param {string} message Prompt message
@@ -52,11 +55,26 @@ module.exports = {
     return answers.result;
   },
 
-    /**
-   * Checks if an object has children
-   * @param {Object} obj Any object to check
+  /**
+   * Confirmation Prompt
+   * @param {string} message Message of confirmation
+   * @param {Array} choices Choices to list in the prompt
+   * @param {Object} options
+   * @param {any} options.default Default of confirmation
    */
-  hasChild(obj) {
-    return !!Object.keys(obj).length;
-  }
+  promptList: async function (message, choices = [], options) {
+    const promptOptions = {
+      type: 'list',
+      message,
+      choices,
+      name: 'result',
+    };
+
+    if (options && options.default) {
+      promptOptions.default = options.default;
+    }
+
+    const answers = await prompt([promptOptions]);
+    return answers.result;
+  },
 };
