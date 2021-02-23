@@ -1,6 +1,6 @@
 {
   "name": "@maartennnn/cli-builder",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "A cli builder tool",
   "main": "src/index.js",
   "scripts": {
