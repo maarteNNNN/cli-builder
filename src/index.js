@@ -376,11 +376,9 @@ class REPLClient {
     const action = await actionPrompt();
 
     if (action === 'n') {
-      pageInfo.offset += increments;
       pageInfo.limit += increments;
       pageInfo.pageNumber++;
     } else if (action === 'p' && pageInfo.pageNumber !== 1) {
-      pageInfo.offset -= increments;
       pageInfo.limit -= increments;
       pageInfo.pageNumber--;
     } else if (action === 'o') {
