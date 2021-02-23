@@ -376,10 +376,10 @@ class REPLClient {
     const action = await actionPrompt();
 
     if (action === 'n') {
-      pageInfo.limit += increments;
+      pageInfo.offset += increments;
       pageInfo.pageNumber++;
     } else if (action === 'p' && pageInfo.pageNumber !== 1) {
-      pageInfo.limit -= increments;
+      pageInfo.offset -= increments;
       pageInfo.pageNumber--;
     } else if (action === 'o') {
       pageInfo.order === 'asc' ? 'desc' : 'asc';
