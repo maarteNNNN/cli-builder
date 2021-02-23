@@ -247,7 +247,7 @@ class REPLClient {
             accumulator = accumulator[currentValue];
             if (typeof accumulator === 'function') await accumulator();
             else if (typeof accumulator.execute === 'function') continue;
-            else if (nextValue === 'help') continue
+            else if (nextValue === 'help') continue;
             else if (!accumulator.hasOwnProperty(nextValue))
               throw new Error('command is invalid and needs more arguments');
           } else if (typeof accumulator['--' + currentValue] === 'function')
@@ -309,12 +309,17 @@ class REPLClient {
     );
   }
 
-  exit = async (code = 0, override = false) => {
+  /**
+   * Exit process
+   * @param {number} code Exit status
+   * @param {Boolean} override Boolean to override interactive
+   */
+  async exit(code = 0, override = false) {
     if (this.options.interactive && !override) return;
     if (this.paginationActive) return;
     if (this.testing) return;
     process.exit(code);
-  };
+  }
 
   /**
    *
