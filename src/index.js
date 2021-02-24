@@ -245,7 +245,8 @@ class REPLClient {
         if (currentValue) {
           if (accumulator.hasOwnProperty(currentValue)) {
             accumulator = accumulator[currentValue];
-            if (typeof accumulator === 'function') await accumulator();
+            if (typeof accumulator === 'function' && !nextValue)
+              await accumulator();
             else if (typeof accumulator.execute === 'function') continue;
             else if (nextValue === 'help') continue;
             else if (!accumulator.hasOwnProperty(nextValue))
@@ -253,7 +254,10 @@ class REPLClient {
           } else if (typeof accumulator['--' + currentValue] === 'function')
             await accumulator['--' + currentValue]();
           else {
-            if (typeof accumulator.execute === 'function') {
+            if (
+              typeof accumulator.execute === 'function' &&
+              this.options.bindActionArgs.length === 0
+            ) {
               await accumulator.execute.call(
                 this,
                 camelCaseToKebab(currentValue),

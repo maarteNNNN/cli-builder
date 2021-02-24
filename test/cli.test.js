@@ -221,4 +221,36 @@ describe('REPL Client tests', () => {
       chai.expect(e).to.not.throw();
     }
   });
+
+  it('it should not pass a parameter when having bindActionArgs', async () => {
+    try {
+      const param = 'argument';
+
+      const testCli = await initiateCli(
+        { ...exampleOptions, bindActionArgs: ['test', 'testing'] },
+        {
+          _: ['paramt', param],
+          help: true,
+        },
+      );
+
+      const commands = {
+        paramt: {
+          execute: (test) => {
+            chai.expect(test).to.be.eql(param);
+          },
+          help: 'Testing this help',
+          input: '<app-name>',
+        },
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai
+        .expect(e.message)
+        .to.be.eql(
+          'Command is not found. Run --help to see all available commands.',
+        );
+    }
+  });
 });
