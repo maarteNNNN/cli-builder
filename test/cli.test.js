@@ -249,7 +249,7 @@ describe('REPL Client tests', () => {
       chai
         .expect(e.message)
         .to.be.eql(
-          'Command is not found. Run --help to see all available commands.',
+          'Command has parameter which is invalid',
         );
     }
   });

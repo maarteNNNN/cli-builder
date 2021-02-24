@@ -263,6 +263,8 @@ class REPLClient {
                 camelCaseToKebab(currentValue),
               );
               return;
+            } else if (this.options.bindActionArgs.length) {
+              throw new Error('Command has parameter which is invalid')
             }
             throw new Error('command invalid');
           }
