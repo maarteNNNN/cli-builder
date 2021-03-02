@@ -102,7 +102,8 @@ The `bindActionArgs` are passed via [`Function.prototype.bind`](https://develope
 
 ```js
 someFunctionCmd: {
-  execute: (argument) => cli.actions.someFunction(argument), // CLI as this will be available but bindActionArgs won't be as argument replaces them
+  // CLI as this will be available but bindActionArgs won't be as argument replaces them
+  execute: (argument) => cli.actions.someFunction(argument),
 }
 ```
 
