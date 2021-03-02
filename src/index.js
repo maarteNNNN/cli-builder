@@ -8,12 +8,13 @@ class REPLClient {
   /**
    * Instanciate the cli
    * @param {Object} options options
-   * @param {boolean} [options.enableInteractive=true] Allow interactive mode
-   * @param {Array<string>} [options.exceptions=[]] Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
-   * @param {string} [options.helpHeader] Header to show in help
-   * @param {string} [options.helpFooter] Footer to show in help
-   * @param {string} [options.binCommand] If error it will show how to access the help command
-   * @param {string} [options.argv] Manually pass arguments to cli (used for testing)
+   * @param {Boolean} [options.enableInteractive=true] Allow interactive mode
+   * @param {Array<String>} [options.exceptions=[]] Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
+   * @param {String} [options.helpHeader] Header to show in help
+   * @param {String} [options.helpFooter] Footer to show in help
+   * @param {String} [options.binCommand] If error it will show how to access the help command
+   * @param {String} [options.argv] Manually pass arguments to cli (used for testing)
+   * @param {Object.<String, Function>} [options.actions={}] Actions to mount to the CLI
    */
   constructor(options = {}) {
     if (process.env.NODE_ENV !== 'testing') this.argv = argv;
