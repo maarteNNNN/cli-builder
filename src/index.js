@@ -1,25 +1,19 @@
 const argv = require('minimist')(process.argv.slice(2));
-const {
-  kebabCaseToCamel,
-  promptInput,
-  promptConfirm,
-  camelCaseToKebab,
-  constants,
-  keyPress,
-  promptList,
-} = require('./lib');
+const inquirer = require('inquirer');
 
-// TODO: Implement an automatic help header with interactive and non-interactive usage, when using help non-interactivaly
+const prompt = inquirer.createPromptModule();
+
+// TODO: Implement an automatic help header with interactive and non-interactive usage, when using help non-interactively
 class REPLClient {
   /**
    * Instanciate the cli
    * @param {Object} options options
-   * @param {boolean} options.enableInteractive Allow interactive mode
-   * @param {Array} options.exceptions Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
-   * @param {string} options.helpHeader Header to show in help
-   * @param {string} options.helpFooter Footer to show in help
-   * @param {string} options.binCommand If error it will show how to access the help command
-   * @param {string} options.argv Manually pass arguments to cli (used for testing)
+   * @param {boolean} [options.enableInteractive=true] Allow interactive mode
+   * @param {Array<string>} [options.exceptions=[]] Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
+   * @param {string} [options.helpHeader] Header to show in help
+   * @param {string} [options.helpFooter] Footer to show in help
+   * @param {string} [options.binCommand] If error it will show how to access the help command
+   * @param {string} [options.argv] Manually pass arguments to cli (used for testing)
    */
   constructor(options = {}) {
     if (process.env.NODE_ENV !== 'testing') this.argv = argv;
@@ -60,21 +54,16 @@ class REPLClient {
     this.helpArray = [];
     this.actions = {};
 
-    // HELPER FUNCTIONS FROM LIB
-    this.camelCaseToKebab = camelCaseToKebab;
-    this.kebabCaseToCamel = kebabCaseToCamel;
-    this.promptInput = promptInput;
-    this.promptConfirm = promptConfirm;
-    this.promptList = promptList;
-    this.keyPress = keyPress;
-
     // CONSTANTS
     this.constants = constants;
 
     this.paginationActive = false;
   }
 
-  logHelpCommands() {
+  /**
+   * @private
+   */
+  _logHelpCommands() {
     if (this.options.helpHeader) console.log(this.options.helpHeader);
 
     this.helpArray.forEach(
@@ -105,7 +94,10 @@ class REPLClient {
     this.helpArray = [];
   }
 
-  getHelpCommands(
+  /**
+   * @private
+   */
+  _getHelpCommands(
     accumulator,
     commands,
     previousValue = null,
@@ -144,7 +136,7 @@ class REPLClient {
               : [previousValue, key]
             : [key];
 
-          this.getHelpCommands(
+          this._getHelpCommands(
             currentValue,
             commands,
             previousValues,
@@ -157,7 +149,7 @@ class REPLClient {
 
   /**
    * Runs the cli interface
-   * @param {Object} commands Command object with function to execute
+   * @param {Object} [commands={}] Command object with function to execute
    */
   async run(commands = {}) {
     // BIND ARGS TO FUNCTIONS
@@ -181,9 +173,9 @@ class REPLClient {
         const { help } = this.commands;
         delete this.commands.help;
 
-        this.getHelpCommands(commands, commands);
+        this._getHelpCommands(commands, commands);
 
-        this.logHelpCommands();
+        this._logHelpCommands();
 
         this.commands.help = help;
       },
@@ -191,23 +183,35 @@ class REPLClient {
 
     // EXECUTE CLI
     this.options.interactive
-      ? await this.interactiveCmd()
-      : await this.commandCmd();
+      ? await this._interactiveCmd()
+      : await this._commandCmd();
   }
 
-  async interactiveCmd() {
+  /**
+   * @async
+   * @private
+   */
+  async _interactiveCmd() {
     const command = await promptInput('>');
-    await this.execCmd(command);
+    await this._execCmd(command);
   }
 
-  async commandCmd() {
+  /**
+   * @async
+   * @private
+   */
+  async _commandCmd() {
     const command = [].concat(this.argv._, Object.keys(this.argv).slice(1));
-    await this.execCmd(command);
+    await this._execCmd(command);
   }
 
-  async execCmd(cmd) {
+  /**
+   * @async
+   * @private
+   */
+  async _execCmd(cmd) {
     if (cmd === '' && this.options.interactive) {
-      await this.interactiveCmd();
+      await this._interactiveCmd();
       return;
     }
 
@@ -226,7 +230,7 @@ class REPLClient {
         if (typeof accumulator.execute === 'function' && !currentValue) {
           await accumulator.execute();
           if (this.options.interactive) {
-            await this.interactiveCmd();
+            await this._interactiveCmd();
             return;
           }
         }
@@ -236,9 +240,9 @@ class REPLClient {
           commands.length - 1 === i &&
           commands.length !== 1
         ) {
-          this.getHelpCommands(accumulator, commands);
-          this.logHelpCommands();
-          if (this.options.interactive) await this.interactiveCmd();
+          this._getHelpCommands(accumulator, commands);
+          this._logHelpCommands();
+          if (this.options.interactive) await this._interactiveCmd();
           return;
         }
 
@@ -264,7 +268,7 @@ class REPLClient {
               );
               return;
             } else if (this.options.bindActionArgs.length) {
-              throw new Error('Command has parameter which is invalid')
+              throw new Error('Command has parameter which is invalid');
             }
             throw new Error('command invalid');
           }
@@ -272,15 +276,22 @@ class REPLClient {
       }
     } catch (e) {
       if (e.message === 'command invalid') {
-        this.invalidCommand();
+        this._invalidCommand();
       } else {
         this.errorLog(e.message);
       }
     }
 
-    if (this.options.interactive) this.interactiveCmd();
+    if (this.options.interactive) this._interactiveCmd();
   }
 
+  /**
+   * Logging green message of success to the console
+   * @description When non-interactively it will exit, unless noExit is provided.
+   * @param {String} successMsg Succes string to log
+   * @param {String} [prefix=''] Add a prefix to the message, it will print the message under a newline
+   * @param {Boolean} [noExit=false] Force to not exit
+   */
   successLog(successMsg, prefix = '', noExit = false) {
     successMsg =
       typeof successMsg === 'object'
@@ -298,6 +309,13 @@ class REPLClient {
     this.exit(0);
   }
 
+  /**
+   * Logging red message of success to the console
+   * @description When non-interactively it will exit, unless noExit is provided.
+   * @param {String} errorMsg Succes string to log
+   * @param {String} [prefix=''] Add a prefix to the message, it will print the message under a newline
+   * @param {Boolean} [noExit=false] Force to not exit
+   */
   errorLog(errorMsg, code = null, noExit = false) {
     if (this.testing) throw new Error(errorMsg);
     console.log(`\x1b[1m\x1b[31mError: ${errorMsg}\x1b[0m`);
@@ -305,7 +323,11 @@ class REPLClient {
     this.exit(code || 1);
   }
 
-  invalidCommand() {
+    /**
+   * Logs help command when an invalid command is given
+   * @private
+   */
+  _invalidCommand() {
     this.errorLog(
       this.options.interactive
         ? 'Type help to see all available commands.'
@@ -317,8 +339,9 @@ class REPLClient {
 
   /**
    * Exit process
-   * @param {number} code Exit status
-   * @param {Boolean} override Boolean to override interactive
+   * @param {Number} [code=0] Exit status
+   * @param {Boolean} [override=false] Boolean to override interactive
+   * @async
    */
   async exit(code = 0, override = false) {
     if (this.options.interactive && !override) return;
@@ -328,16 +351,19 @@ class REPLClient {
   }
 
   /**
-   *
+   * Makes pagination available to interactively browser through results
+   * @description Clears the console to present the result(s)
    * @param {any} output What info will be outputted through the `successLog` method
    * @param {Object} pageInfo Info about the page
-   * @param {Number} pageInfo.offset Offset of the query
-   * @param {Number} pageInfo.limit Limit of the query
-   * @param {Number} pageInfo.pageNumber Number of the current page
-   * @param {Number} pageInfo.order Order to run the query
-   * @param {Number} increments Increments on offset en limit
-   * @param {Function} fn Function to execute while keeping page interactive
-   * @param {Array<string>} args Arguments to pass through that function
+   * @param {Number} [pageInfo.offset=1] Offset of the query
+   * @param {Number} [pageInfo.limit=1] Limit of the query
+   * @param {Number} [pageInfo.pageNumber=1] Number of the current page
+   * @param {('asc'|'desc')} [pageInfo.order='asc'] Order to run the query
+   * @param {Number} [increments=1] Increments on offset en limit (is always lowercase)
+   * @param {Function} [fn=()=>{}] Function to execute while keeping page interactive
+   * @param {Array<string>} [args=[]] Arguments to pass on through the given fn function
+   * @async
+   * @returns {(Function|null)}
    */
   async pagination(
     output,
@@ -396,6 +422,94 @@ class REPLClient {
     } else {
       return this.successLog('Exiting pagination...');
     }
+  }
+
+    /**
+   * Converts camelCase to kebas-case
+   * @param {String} str String to be converted to kebab-case
+   * @returns {String} kebab-case value
+   */
+  camelCaseToKebab (str) {
+    return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase()
+  }
+
+  /**
+   * Converts kebab-case to camelCase
+   * @param {String} str String to be converted to camelCase
+   * @returns {String} camelCase value
+   */
+  kebabCaseToCamel (str) {
+    str.includes('--')
+      ? str.replace('--', '')
+      : str.replace(/-./g, (x) => x.toUpperCase()[1])
+  }
+
+  /**
+   * Prompt wrapper function
+   * @param {String} message Prompt message
+   * @param {Boolean} secret When true input is hidden
+   * @returns {string} Value given to prompt
+   * @async
+   */
+  promptInput = async function (message, secret) {
+    const answer = await prompt([
+      {
+        type: secret ? 'password' : 'input',
+        message,
+        name: 'result',
+        default: null,
+        prefix: '',
+      },
+    ]);
+    return answer.result;
+  }
+
+  /**
+   * Confirmation Prompt
+   * @param {String} message Message of confirmation
+   * @param {Object} options
+   * @param {any} options.default Default of confirmation
+   * @returns {Boolean} Value given to prompt
+   * @async
+   */
+  promptConfirm = async function (message, options) {
+    const promptOptions = {
+      type: 'confirm',
+      message,
+      name: 'result',
+    };
+
+    if (options && options.default) {
+      promptOptions.default = options.default;
+    }
+
+    const answers = await prompt([promptOptions]);
+    return answers.result;
+  }
+
+  /**
+   * Confirmation Prompt
+   * @param {String} message Message of confirmation
+   * @param {Array} [choices=[]] Choices to list in the prompt
+   * @param {Object} options
+   * @param {any} options.default Default of confirmation
+   * @returns {string} Value given to prompt
+   * @async
+   */
+  promptList = async function (message, choices = [], options) {
+    const promptOptions = {
+      type: 'list',
+      message,
+      choices,
+      name: 'result',
+    };
+
+    if (options && options.default) {
+      promptOptions.default = options.default;
+    }
+
+    const answers = await prompt([promptOptions]);
+    return answers.result;
   }
 }
 
