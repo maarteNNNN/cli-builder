@@ -220,7 +220,9 @@ class REPLClient {
       let accumulator = this.commands;
 
       for (let i = 0; i < commands.length + 1; i++) {
-        const currentValue = commands[i] ? this.kebabCaseToCamel(commands[i]) : null;
+        const currentValue = commands[i]
+          ? this.kebabCaseToCamel(commands[i])
+          : null;
         const nextValue = commands[i + 1]
           ? this.kebabCaseToCamel(commands[i + 1])
           : null;
@@ -256,10 +258,7 @@ class REPLClient {
           } else if (typeof accumulator['--' + currentValue] === 'function')
             await accumulator['--' + currentValue]();
           else {
-            if (
-              typeof accumulator.execute === 'function' &&
-              this.options.bindActionArgs.length === 0
-            ) {
+            if (typeof accumulator.execute === 'function') {
               await accumulator.execute.call(
                 this,
                 this.camelCaseToKebab(currentValue),
@@ -321,7 +320,7 @@ class REPLClient {
     this.exit(code || 1);
   }
 
-    /**
+  /**
    * Logs help command when an invalid command is given
    * @private
    */
@@ -422,13 +421,13 @@ class REPLClient {
     }
   }
 
-    /**
+  /**
    * Converts camelCase to kebas-case
    * @param {String} str String to be converted to kebab-case
    * @returns {String} kebab-case value
    */
-  camelCaseToKebab (str) {
-    return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase()
+  camelCaseToKebab(str) {
+    return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
   }
 
   /**
@@ -436,10 +435,10 @@ class REPLClient {
    * @param {String} str String to be converted to camelCase
    * @returns {String} camelCase value
    */
-  kebabCaseToCamel (str) {
+  kebabCaseToCamel(str) {
     return str.includes('--')
       ? str.replace('--', '')
-      : str.replace(/-./g, (x) => x.toUpperCase()[1])
+      : str.replace(/-./g, (x) => x.toUpperCase()[1]);
   }
 
   /**
@@ -460,7 +459,7 @@ class REPLClient {
       },
     ]);
     return answer.result;
-  }
+  };
 
   /**
    * Confirmation Prompt
@@ -483,7 +482,7 @@ class REPLClient {
 
     const answers = await prompt([promptOptions]);
     return answers.result;
-  }
+  };
 
   /**
    * Confirmation Prompt
@@ -508,7 +507,7 @@ class REPLClient {
 
     const answers = await prompt([promptOptions]);
     return answers.result;
-  }
+  };
 }
 
 module.exports = {
