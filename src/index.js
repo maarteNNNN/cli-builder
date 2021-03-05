@@ -248,13 +248,23 @@ class REPLClient {
 
         if (currentValue) {
           if (accumulator.hasOwnProperty(currentValue)) {
-            accumulator = accumulator[currentValue];
-            if (typeof accumulator === 'function' && !nextValue)
-              await accumulator();
-            else if (typeof accumulator.execute === 'function') continue;
-            else if (nextValue === 'help') continue;
-            else if (!accumulator.hasOwnProperty(nextValue))
-              throw new Error('command is invalid and needs more arguments');
+            if (
+              accumulator[currentValue].hasOwnProperty('help') &&
+              !accumulator[currentValue].hasOwnProperty('execute')
+            )
+              await accumulator.execute.call(
+                this,
+                this.camelCaseToKebab(currentValue),
+              );
+            else {
+              accumulator = accumulator[currentValue];
+              if (typeof accumulator === 'function' && !nextValue)
+                await accumulator();
+              else if (typeof accumulator.execute === 'function') continue;
+              else if (nextValue === 'help') continue;
+              else if (!accumulator.hasOwnProperty(nextValue))
+                throw new Error('command is invalid and needs more arguments');
+            }
           } else if (typeof accumulator['--' + currentValue] === 'function')
             await accumulator['--' + currentValue]();
           else {
@@ -425,8 +435,11 @@ class REPLClient {
    * Converts camelCase to kebas-case
    * @param {String} str String to be converted to kebab-case
    * @returns {String} kebab-case value
+   * @throws {TypeError} No string given or not a string
    */
   camelCaseToKebab(str) {
+    if (!str || typeof str !== 'string')
+      throw new TypeError('Not a string or no string given');
     return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
   }
 
@@ -434,8 +447,11 @@ class REPLClient {
    * Converts kebab-case to camelCase
    * @param {String} str String to be converted to camelCase
    * @returns {String} camelCase value
+   * @throws {TypeError} No string given or not a string
    */
   kebabCaseToCamel(str) {
+    if (!str || typeof str !== 'string')
+      throw new TypeError('Not a string or no string given');
     return str.includes('--')
       ? str.replace('--', '')
       : str.replace(/-./g, (x) => x.toUpperCase()[1]);

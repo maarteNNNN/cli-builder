@@ -1,29 +1,6 @@
 const chai = require('chai');
-const chaiThings = require('chai-things');
-const chaiLike = require('chai-like');
 
 const { REPLClient } = require('../src');
-
-const exampleCommands = {
-  extreme: {
-    case: {
-      that: {
-        is: {
-          with: {
-            lots: {
-              of: {
-                commands: {
-                  execute: () => {},
-                  help: 'works',
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-};
 
 const exampleArgs = {
   _: ['extreme', 'case', 'that', 'is', 'with', 'lots', 'of', 'commands'],
@@ -222,35 +199,34 @@ describe('REPL Client tests', () => {
     }
   });
 
-  // it('it should not pass a parameter when having bindActionArgs', async () => {
-  //   try {
-  //     const param = 'argument';
+  it('it should run the parent execute if only help is defined', async () => {
+    try {
+      const testCli = await initiateCli(
+        { ...exampleOptions },
+        {
+          _: ['wallet', 'child'],
+          help: true,
+        },
+      );
 
-  //     const testCli = await initiateCli(
-  //       { ...exampleOptions, bindActionArgs: ['test', 'testing'] },
-  //       {
-  //         _: ['paramt', param],
-  //         help: true,
-  //       },
-  //     );
+      const commands = {
+        wallet: {
+          execute: (test) => {
+            chai.expect(test).to.be.eql('child');
+          },
+          child: {
+            help: 'Testing this help',
+          }
+        },
+      };
 
-  //     const commands = {
-  //       paramt: {
-  //         execute: (test) => {
-  //           chai.expect(test).to.be.eql(param);
-  //         },
-  //         help: 'Testing this help',
-  //         input: '<app-name>',
-  //       },
-  //     };
-
-  //     await testCli.run(commands);
-  //   } catch (e) {
-  //     chai
-  //       .expect(e.message)
-  //       .to.be.eql(
-  //         'Command has parameter which is invalid',
-  //       );
-  //   }
-  // });
+      await testCli.run(commands);
+    } catch (e) {
+      chai
+        .expect(e.message)
+        .to.be.eql(
+          'Command has parameter which is invalid',
+        );
+    }
+  });
 });
