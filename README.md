@@ -1,5 +1,16 @@
 # CLI-Builder
 
+## Trying out an example
+This example can be found in `bin/example-cli.js`
+
+```sh
+git clone https://github.com/maarteNNNN/cli-builder.git
+npm install
+npm link
+cli-builder help
+npm unlink # to delete the cli-builder bin
+```
+
 ## Installing
 
 ```

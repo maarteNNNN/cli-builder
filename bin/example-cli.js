@@ -64,7 +64,7 @@ const commands = {
     },
     async execute(param) {
       console.log(this); // Mounts the REPLClient dynamically
-      console.log(param); // Passes the last given param dynamically
+      console.log(param); // Passes the last given argument/param dynamically
     },
   },
 };
