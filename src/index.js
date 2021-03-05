@@ -55,9 +55,6 @@ class REPLClient {
     this.helpArray = [];
     this.actions = {};
 
-    // CONSTANTS
-    this.constants = constants;
-
     this.paginationActive = false;
   }
 
@@ -119,8 +116,8 @@ class REPLClient {
         this.helpArray.push({
           // Add the command if is array join it eg. `some deep nested command` or key as string when it is in the root object
           command: Array.isArray(previousValue)
-            ? camelCaseToKebab(previousValue.join(' '))
-            : camelCaseToKebab(key),
+            ? this.camelCaseToKebab(previousValue.join(' '))
+            : this.camelCaseToKebab(key),
           description:
             typeof currentValue === 'function'
               ? 'No description available'
@@ -223,9 +220,9 @@ class REPLClient {
       let accumulator = this.commands;
 
       for (let i = 0; i < commands.length + 1; i++) {
-        const currentValue = commands[i] ? kebabCaseToCamel(commands[i]) : null;
+        const currentValue = commands[i] ? this.kebabCaseToCamel(commands[i]) : null;
         const nextValue = commands[i + 1]
-          ? kebabCaseToCamel(commands[i + 1])
+          ? this.kebabCaseToCamel(commands[i + 1])
           : null;
 
         if (typeof accumulator.execute === 'function' && !currentValue) {
@@ -265,7 +262,7 @@ class REPLClient {
             ) {
               await accumulator.execute.call(
                 this,
-                camelCaseToKebab(currentValue),
+                this.camelCaseToKebab(currentValue),
               );
               return;
             } else if (this.options.bindActionArgs.length) {
@@ -440,7 +437,7 @@ class REPLClient {
    * @returns {String} camelCase value
    */
   kebabCaseToCamel (str) {
-    str.includes('--')
+    return str.includes('--')
       ? str.replace('--', '')
       : str.replace(/-./g, (x) => x.toUpperCase()[1])
   }
