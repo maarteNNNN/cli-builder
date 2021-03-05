@@ -66,7 +66,7 @@ describe('REPL Client tests', () => {
     }
   });
 
-  it('it should run with execute as function', async () => {
+  it('it should run without execute as function', async () => {
     try {
       const testCli = await initiateCli(exampleOptions, { _: ['command'] });
 
