@@ -29,7 +29,6 @@
   "dependencies": {
     "fs-extra": "^9.0.1",
     "inquirer": "^7.3.3",
-    "ldpos-client": "^5.0.1",
     "minimist": "^1.2.5"
   },
   "devDependencies": {
