@@ -400,7 +400,7 @@ class REPLClient {
     );
     console.log(`Quit (q)`);
     const actionPrompt = async () => {
-      const paginationInput = await promptInput('>');
+      const paginationInput = await this.promptInput('>');
       if (paginationInput === '') {
         actionPrompt();
       } else if (['q', 'quit', 'exit'].includes(paginationInput)) {
