@@ -187,7 +187,7 @@ class REPLClient {
     };
 
     // FORCE UPDATE OF INTERACTIVE
-    this._isInteractive()
+    this._isInteractive();
 
     // EXECUTE CLI
     this.options.interactive
@@ -261,20 +261,21 @@ class REPLClient {
             if (
               accumulator[currentValue].hasOwnProperty('help') &&
               !accumulator[currentValue].hasOwnProperty('execute')
-            )
+            ) {
               await accumulator.execute.call(
                 this,
                 this.camelCaseToKebab(currentValue),
               );
-            else {
-              accumulator = accumulator[currentValue];
-              if (typeof accumulator === 'function' && !nextValue)
-                await accumulator();
-              else if (typeof accumulator.execute === 'function') continue;
-              else if (nextValue === 'help') continue;
-              else if (!accumulator.hasOwnProperty(nextValue))
-                throw new Error('command is invalid and needs more arguments');
+              if (this.options.interactive) await this._interactiveCmd();
+              return;
             }
+            accumulator = accumulator[currentValue];
+            if (typeof accumulator === 'function' && !nextValue)
+              await accumulator();
+            else if (typeof accumulator.execute === 'function') continue;
+            else if (nextValue === 'help') continue;
+            else if (!accumulator.hasOwnProperty(nextValue))
+              throw new Error('command is invalid and needs more arguments');
           } else if (typeof accumulator['--' + currentValue] === 'function')
             await accumulator['--' + currentValue]();
           else {
@@ -448,7 +449,8 @@ class REPLClient {
    * @throws {TypeError} No string given or not a string
    */
   camelCaseToKebab(str) {
-    if (!str || typeof str !== 'string')
+    if (!str) return;
+    if (typeof str !== 'string')
       throw new TypeError('Not a string or no string given');
     return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
   }
@@ -460,7 +462,8 @@ class REPLClient {
    * @throws {TypeError} No string given or not a string
    */
   kebabCaseToCamel(str) {
-    if (!str || typeof str !== 'string')
+    if (!str) return;
+    if (typeof str !== 'string')
       throw new TypeError('Not a string or no string given');
     return str.includes('--')
       ? str.replace('--', '')
