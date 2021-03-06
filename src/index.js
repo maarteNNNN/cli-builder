@@ -27,11 +27,7 @@ class REPLClient {
 
     if (!this.options.enableInteractive) this.options.enableInteractive = true;
 
-    this.options.interactive =
-      (!this.argv._.length || Object.keys(this.argv).length > 1) &&
-      // Case its --help, --version or -v
-      !Object.keys(this.argv).slice(1).length &&
-      this.options.enableInteractive;
+    this._isInteractive();
 
     if (!this.options.command) this.options.command = '';
 
@@ -56,6 +52,17 @@ class REPLClient {
     this.actions = {};
 
     this.paginationActive = false;
+  }
+
+  /**
+   * @private
+   */
+  _isInteractive() {
+    this.options.interactive =
+      (!this.argv._.length || Object.keys(this.argv).length > 1) &&
+      // Case its --help, --version or -v
+      !Object.keys(this.argv).slice(1).length &&
+      this.options.enableInteractive;
   }
 
   /**
@@ -179,6 +186,9 @@ class REPLClient {
       },
     };
 
+    // FORCE UPDATE OF INTERACTIVE
+    this._isInteractive()
+
     // EXECUTE CLI
     this.options.interactive
       ? await this._interactiveCmd()
@@ -190,7 +200,7 @@ class REPLClient {
    * @private
    */
   async _interactiveCmd() {
-    const command = await promptInput('>');
+    const command = await this.promptInput('>');
     await this._execCmd(command);
   }
 
