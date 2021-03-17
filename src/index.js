@@ -238,7 +238,10 @@ class REPLClient {
           : null;
 
         if (typeof accumulator.execute === 'function' && !currentValue) {
-          await accumulator.execute();
+          await accumulator.execute.call(
+            this,
+            this.camelCaseToKebab(currentValue),
+          );
           if (this.options.interactive) {
             await this._interactiveCmd();
             return;
