@@ -336,11 +336,13 @@ class REPLClient {
    * @param {String} errorMsg Succes string to log
    * @param {String} [prefix=''] Add a prefix to the message, it will print the message under a newline
    * @param {Boolean} [noExit=false] Force to not exit
+   * @param {Boolean} [force=false] Force to exit
    */
-  errorLog(errorMsg, code = null, noExit = false) {
+  errorLog(errorMsg, code = null, noExit = false, force = false) {
+    if (noExit && force) throw new Error('Both noExit and force are true.')
     if (this.testing) throw new Error(errorMsg);
     console.log(`\x1b[1m\x1b[31mError: ${errorMsg}\x1b[0m`);
-    if (noExit) return;
+    if (noExit && !force) return;
     this.exit(code || 1);
   }
 
