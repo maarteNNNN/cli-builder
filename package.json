@@ -7,7 +7,8 @@
     "test": "NODE_ENV=testing mocha --exit",
     "test:watch": "NODE_ENV=testing mocha -w",
     "publish": "npm publish --access public --scope=@maartennnn",
-    "jsdoc2md": "jsdoc2md src/index.js"
+    "jsdoc2md": "jsdoc2md src/index.js 2>&1| tee API.md",
+    "jdoc": "jsdoc index.js"
   },
   "bin": {
     "cli-builder": "bin/example-cli.js"
