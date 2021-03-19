@@ -343,7 +343,7 @@ class REPLClient {
     if (this.testing) throw new Error(errorMsg);
     console.log(`\x1b[1m\x1b[31mError: ${errorMsg}\x1b[0m`);
     if (noExit && !force) return;
-    this.exit(code || 1);
+    this.exit(code || 1, force);
   }
 
   /**
