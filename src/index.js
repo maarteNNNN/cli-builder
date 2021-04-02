@@ -482,7 +482,7 @@ class REPLClient {
    * @returns {string} Value given to prompt
    * @async
    */
-  promptInput = async function (message, secret) {
+   async promptInput (message, secret) {
     const answer = await prompt([
       {
         type: secret ? 'password' : 'input',
@@ -503,7 +503,7 @@ class REPLClient {
    * @returns {Boolean} Value given to prompt
    * @async
    */
-  promptConfirm = async function (message, options) {
+  async promptConfirm (message, options) {
     const promptOptions = {
       type: 'confirm',
       message,
@@ -527,7 +527,7 @@ class REPLClient {
    * @returns {string} Value given to prompt
    * @async
    */
-  promptList = async function (message, choices = [], options) {
+  async promptList (message, choices = [], options) {
     const promptOptions = {
       type: 'list',
       message,
