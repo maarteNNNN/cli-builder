@@ -242,10 +242,7 @@ class REPLClient {
             this,
             this.camelCaseToKebab(currentValue),
           );
-          if (this.options.interactive) {
-            await this._interactiveCmd();
-            return;
-          }
+          if (this.options.interactive) break;
         }
 
         if (
@@ -269,8 +266,7 @@ class REPLClient {
                 this,
                 this.camelCaseToKebab(currentValue),
               );
-              if (this.options.interactive) await this._interactiveCmd();
-              return;
+              if (this.options.interactive) break;
             }
             accumulator = accumulator[currentValue];
             if (typeof accumulator === 'function' && !nextValue)
@@ -287,7 +283,7 @@ class REPLClient {
                 this,
                 this.camelCaseToKebab(currentValue),
               );
-              return;
+              break;
             } else if (this.options.bindActionArgs.length) {
               throw new Error('Command has parameter which is invalid');
             }
@@ -339,7 +335,7 @@ class REPLClient {
    * @param {Boolean} [force=false] Force to exit
    */
   errorLog(errorMsg, code = null, noExit = false, force = false) {
-    if (noExit && force) throw new Error('Both noExit and force are true.')
+    if (noExit && force) throw new Error('Both noExit and force are true.');
     if (this.testing) throw new Error(errorMsg);
     console.log(`\x1b[1m\x1b[31mError: ${errorMsg}\x1b[0m`);
     if (noExit && !force) return;
@@ -482,7 +478,7 @@ class REPLClient {
    * @returns {string} Value given to prompt
    * @async
    */
-   async promptInput (message, secret) {
+  async promptInput(message, secret) {
     const answer = await prompt([
       {
         type: secret ? 'password' : 'input',
@@ -493,7 +489,7 @@ class REPLClient {
       },
     ]);
     return answer.result;
-  };
+  }
 
   /**
    * Confirmation Prompt
@@ -503,7 +499,7 @@ class REPLClient {
    * @returns {Boolean} Value given to prompt
    * @async
    */
-  async promptConfirm (message, options) {
+  async promptConfirm(message, options) {
     const promptOptions = {
       type: 'confirm',
       message,
@@ -516,7 +512,7 @@ class REPLClient {
 
     const answers = await prompt([promptOptions]);
     return answers.result;
-  };
+  }
 
   /**
    * Confirmation Prompt
@@ -527,7 +523,7 @@ class REPLClient {
    * @returns {string} Value given to prompt
    * @async
    */
-  async promptList (message, choices = [], options) {
+  async promptList(message, choices = [], options) {
     const promptOptions = {
       type: 'list',
       message,
@@ -541,7 +537,7 @@ class REPLClient {
 
     const answers = await prompt([promptOptions]);
     return answers.result;
-  };
+  }
 }
 
 module.exports = {
