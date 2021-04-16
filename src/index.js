@@ -209,6 +209,10 @@ class REPLClient {
    * @private
    */
   async _commandCmd() {
+    if (this.argv.hasOwnProperty('h')) {
+      delete this.argv.h;
+      this.argv._.push('help');
+    }
     const command = [].concat(this.argv._, Object.keys(this.argv).slice(1));
     await this._execCmd(command);
   }
@@ -285,18 +289,14 @@ class REPLClient {
               );
               break;
             } else if (this.options.bindActionArgs.length) {
-              throw new Error('Command has parameter which is invalid');
+              throw new Error('Command has parameter which is invalid.');
             }
-            throw new Error('command invalid');
+            throw new Error('Command invalid.');
           }
         }
       }
     } catch (e) {
-      if (e.message === 'command invalid') {
-        this._invalidCommand();
-      } else {
-        this.errorLog(e.message);
-      }
+      this._invalidCommand(e.message);
     }
 
     if (this.options.interactive) this._interactiveCmd();
@@ -346,11 +346,12 @@ class REPLClient {
    * Logs help command when an invalid command is given
    * @private
    */
-  _invalidCommand() {
+  _invalidCommand(message) {
+    this.errorLog(message, null, true);
     this.errorLog(
       this.options.interactive
         ? 'Type help to see all available commands.'
-        : `Command is not found. Run ${
+        : `Run ${
             this.options.binCommand ? this.options.binCommand + ' ' : ''
           }--help to see all available commands.`,
     );
