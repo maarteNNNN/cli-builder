@@ -8,8 +8,8 @@
     "test:watch": "NODE_ENV=testing mocha -w",
     "publish": "npm publish --access public --scope=@maartennnn",
     "jsdoc2md": "jsdoc2md src/index.js 2>&1| tee API.md",
-    "jdoc": "jsdoc index.js",
-    "preversion": "npm run test",
+    "jdoc": "jsdoc src/index.js",
+    "preversion": "npm run test && jsdoc2md && git commit -m 'Generated API Docs'",
     "postversion": "git push && git push --follow-tags && npm run publish"
   },
   "bin": {
