@@ -9,7 +9,7 @@
     "publish": "npm publish --access public --scope=@maartennnn",
     "jsdoc2md": "jsdoc2md src/index.js 2>&1| tee API.md",
     "jdoc": "jsdoc src/index.js",
-    "preversion": "npm run test && npm run jsdoc2md && git commit -m 'Generated API Docs'",
+    "preversion": "npm run test && npm run jsdoc2md && git add . && git commit -m 'Generated API Docs'",
     "postversion": "git push && git push --follow-tags && npm run publish"
   },
   "bin": {
