@@ -1,3 +1,6 @@
+Debugger listening on ws://127.0.0.1:41779/460271da-e403-45a8-8c32-ee40003544d8
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
 <a name="REPLClient"></a>
 
 ## REPLClient
@@ -5,9 +8,6 @@
 
 * [REPLClient](#REPLClient)
     * [new REPLClient(options)](#new_REPLClient_new)
-    * [.promptInput](#REPLClient+promptInput) ⇒ <code>string</code>
-    * [.promptConfirm](#REPLClient+promptConfirm) ⇒ <code>Boolean</code>
-    * [.promptList](#REPLClient+promptList) ⇒ <code>string</code>
     * [.run([commands])](#REPLClient+run)
     * [.successLog(successMsg, [prefix], [noExit])](#REPLClient+successLog)
     * [.errorLog(errorMsg, [prefix], [noExit], [force])](#REPLClient+errorLog)
@@ -15,6 +15,9 @@
     * [.pagination(output, pageInfo, [increments], [fn], [args])](#REPLClient+pagination) ⇒ <code>function</code> \| <code>null</code>
     * [.camelCaseToKebab(str)](#REPLClient+camelCaseToKebab) ⇒ <code>String</code>
     * [.kebabCaseToCamel(str)](#REPLClient+kebabCaseToCamel) ⇒ <code>String</code>
+    * [.promptInput(message, secret)](#REPLClient+promptInput) ⇒ <code>string</code>
+    * [.promptConfirm(message, options)](#REPLClient+promptConfirm) ⇒ <code>Boolean</code>
+    * [.promptList(message, [choices], options)](#REPLClient+promptList) ⇒ <code>string</code>
 
 <a name="new_REPLClient_new"></a>
 
@@ -32,48 +35,6 @@ Instanciate the cli
 | [options.binCommand] | <code>String</code> |  | If error it will show how to access the help command |
 | [options.argv] | <code>String</code> |  | Manually pass arguments to cli (used for testing) |
 | [options.actions] | <code>Object.&lt;String, function()&gt;</code> | <code>{}</code> | Actions to mount to the CLI |
-
-<a name="REPLClient+promptInput"></a>
-
-### replClient.promptInput ⇒ <code>string</code>
-Prompt wrapper function
-
-**Kind**: instance property of [<code>REPLClient</code>](#REPLClient)  
-**Returns**: <code>string</code> - Value given to prompt  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| message | <code>String</code> | Prompt message |
-| secret | <code>Boolean</code> | When true input is hidden |
-
-<a name="REPLClient+promptConfirm"></a>
-
-### replClient.promptConfirm ⇒ <code>Boolean</code>
-Confirmation Prompt
-
-**Kind**: instance property of [<code>REPLClient</code>](#REPLClient)  
-**Returns**: <code>Boolean</code> - Value given to prompt  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| message | <code>String</code> | Message of confirmation |
-| options | <code>Object</code> |  |
-| options.default | <code>any</code> | Default of confirmation |
-
-<a name="REPLClient+promptList"></a>
-
-### replClient.promptList ⇒ <code>string</code>
-Confirmation Prompt
-
-**Kind**: instance property of [<code>REPLClient</code>](#REPLClient)  
-**Returns**: <code>string</code> - Value given to prompt  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| message | <code>String</code> |  | Message of confirmation |
-| [choices] | <code>Array</code> | <code>[]</code> | Choices to list in the prompt |
-| options | <code>Object</code> |  |  |
-| options.default | <code>any</code> |  | Default of confirmation |
 
 <a name="REPLClient+run"></a>
 
@@ -176,3 +137,46 @@ Converts kebab-case to camelCase
 | --- | --- | --- |
 | str | <code>String</code> | String to be converted to camelCase |
 
+<a name="REPLClient+promptInput"></a>
+
+### replClient.promptInput(message, secret) ⇒ <code>string</code>
+Prompt wrapper function
+
+**Kind**: instance method of [<code>REPLClient</code>](#REPLClient)  
+**Returns**: <code>string</code> - Value given to prompt  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| message | <code>String</code> | Prompt message |
+| secret | <code>Boolean</code> | When true input is hidden |
+
+<a name="REPLClient+promptConfirm"></a>
+
+### replClient.promptConfirm(message, options) ⇒ <code>Boolean</code>
+Confirmation Prompt
+
+**Kind**: instance method of [<code>REPLClient</code>](#REPLClient)  
+**Returns**: <code>Boolean</code> - Value given to prompt  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| message | <code>String</code> | Message of confirmation |
+| options | <code>Object</code> |  |
+| options.default | <code>any</code> | Default of confirmation |
+
+<a name="REPLClient+promptList"></a>
+
+### replClient.promptList(message, [choices], options) ⇒ <code>string</code>
+Confirmation Prompt
+
+**Kind**: instance method of [<code>REPLClient</code>](#REPLClient)  
+**Returns**: <code>string</code> - Value given to prompt  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| message | <code>String</code> |  | Message of confirmation |
+| [choices] | <code>Array</code> | <code>[]</code> | Choices to list in the prompt |
+| options | <code>Object</code> |  |  |
+| options.default | <code>any</code> |  | Default of confirmation |
+
+Waiting for the debugger to disconnect...
