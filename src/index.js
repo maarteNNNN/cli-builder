@@ -183,6 +183,8 @@ class REPLClient {
         this._logHelpCommands();
 
         this.commands.help = help;
+
+        this.exit(0);
       },
     };
 
@@ -210,8 +212,8 @@ class REPLClient {
    */
   async _commandCmd() {
     if (this.argv.hasOwnProperty('h')) {
+      this.argv.help = true;
       delete this.argv.h;
-      this.argv._.push('help');
     }
     const command = [].concat(this.argv._, Object.keys(this.argv).slice(1));
     await this._execCmd(command);
@@ -361,9 +363,8 @@ class REPLClient {
    * Exit process
    * @param {Number} [code=0] Exit status
    * @param {Boolean} [override=false] Boolean to override interactive
-   * @async
    */
-  async exit(code = 0, override = false) {
+  exit(code = 0, override = false) {
     if (this.options.interactive && !override) return;
     if (this.paginationActive) return;
     if (this.testing) return;
