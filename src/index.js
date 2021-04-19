@@ -25,7 +25,7 @@ class REPLClient {
     // OPTIONS
     this.options = options;
 
-    if (!this.options.enableInteractive) this.options.enableInteractive = true;
+    if (this.options.enableInteractive == undefined) this.options.enableInteractive = true;
 
     this._isInteractive();
 
