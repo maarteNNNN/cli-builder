@@ -9,7 +9,7 @@ class REPLClient {
    * Instanciate the cli
    * @param {Object} options options
    * @param {Boolean} [options.enableInteractive=true] Allow interactive mode
-   * @param {Array<String>} [options.exceptions=[]] Commands that do not execute the beforeCommandFn and afterCommandFn (eg. help)
+   * @param {Array<String>} [options.exceptions=[]] The ability to explicitely not execute code before the actual command. E.g. an API call.
    * @param {String} [options.helpHeader] Header to show in help
    * @param {String} [options.helpFooter] Footer to show in help
    * @param {String} [options.binCommand] If error it will show how to access the help command
@@ -32,20 +32,12 @@ class REPLClient {
 
     if (!this.options.command) this.options.command = '';
 
-    const defaultExceptions = ['help', 'v', 'version'];
+    const defaultExceptions = ['help', 'h', 'v', 'version'];
     if (!this.options.exceptions) this.options.exceptions = defaultExceptions;
     else
       this.options.exceptions = [
         ...new Set([...this.options.exceptions, ...defaultExceptions]),
       ];
-
-    // Check if has exceptions, this is only executed when not interactive
-    for (let i = 0; i < this.options.exceptions.length; i++) {
-      const exception = this.options.exceptions[i];
-      if (this.argv.hasOwnProperty(exception)) {
-        this.options.exception = true;
-      }
-    }
 
     if (!this.options.bindActionArgs) this.options.bindActionArgs = [];
 
