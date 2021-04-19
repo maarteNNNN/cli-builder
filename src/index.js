@@ -235,7 +235,7 @@ class REPLClient {
           this.commands.help = help;
 
           // TODO: when using help or --help the program exits normally, with -h it loops over it's internals, so we need to force exit...
-          this.exit(0)
+          this.exit(0);
 
           // Return because the action is done
           break;
@@ -253,16 +253,19 @@ class REPLClient {
               );
               if (this.options.interactive) break;
             }
+
             accumulator = accumulator[currentValue];
-            if (typeof accumulator === 'function' && !nextValue)
+
+            if (typeof accumulator === 'function' && !nextValue) {
               await accumulator();
-            else if (typeof accumulator.execute === 'function') continue;
+            } else if (typeof accumulator.execute === 'function') continue;
             else if (nextValue === 'help') continue;
-            else if (!accumulator.hasOwnProperty(nextValue))
+            else if (!accumulator.hasOwnProperty(nextValue)) {
               throw new Error('command is invalid and needs more arguments');
-          } else if (typeof accumulator['--' + currentValue] === 'function')
+            }
+          } else if (typeof accumulator['--' + currentValue] === 'function') {
             await accumulator['--' + currentValue]();
-          else {
+          } else {
             if (typeof accumulator.execute === 'function') {
               await accumulator.execute.call(
                 this,
