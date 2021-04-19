@@ -25,7 +25,8 @@ class REPLClient {
     // OPTIONS
     this.options = options;
 
-    if (this.options.enableInteractive == undefined) this.options.enableInteractive = true;
+    if (this.options.enableInteractive == undefined)
+      this.options.enableInteractive = true;
 
     this._isInteractive();
 
@@ -171,23 +172,6 @@ class REPLClient {
     // COMMANDS
     this.commands = commands;
 
-    this.commands = {
-      ...this.commands,
-      help: async () => {
-        const commands = this.commands;
-        const { help } = this.commands;
-        delete this.commands.help;
-
-        this._getHelpCommands(commands, commands);
-
-        this._logHelpCommands();
-
-        this.commands.help = help;
-
-        this.exit(0);
-      },
-    };
-
     // FORCE UPDATE OF INTERACTIVE
     this._isInteractive();
 
@@ -211,10 +195,6 @@ class REPLClient {
    * @private
    */
   async _commandCmd() {
-    if (this.argv.hasOwnProperty('h')) {
-      this.argv.help = true;
-      delete this.argv.h;
-    }
     const command = [].concat(this.argv._, Object.keys(this.argv).slice(1));
     await this._execCmd(command);
   }
@@ -224,11 +204,10 @@ class REPLClient {
    * @private
    */
   async _execCmd(cmd) {
-    if (cmd === '' && this.options.interactive) {
-      await this._interactiveCmd();
-      return;
-    }
+    // If no input is provided
+    if (cmd === '' && this.options.interactive) await this._interactiveCmd();
 
+    // If interactive make the cmd an array to loop over
     if (cmd.includes(' ')) cmd = cmd.split(' ');
 
     try {
@@ -251,15 +230,23 @@ class REPLClient {
           if (this.options.interactive) break;
         }
 
-        if (
-          (currentValue === 'help' || currentValue === '--help') &&
-          commands.length - 1 === i &&
-          commands.length !== 1
-        ) {
+        if (currentValue === 'help' || currentValue === 'h') {
+          const { help } = this.commands;
+
+          // Delete help out of command to not display it in the help command.
+          delete this.commands.help;
+
           this._getHelpCommands(accumulator, commands);
           this._logHelpCommands();
-          if (this.options.interactive) await this._interactiveCmd();
-          return;
+
+          // Add the command again
+          this.commands.help = help;
+
+          // TODO: when using help or --help the program exits normally, with -h it loops over it's internals, so we need to force exit...
+          this.exit(0)
+
+          // Return because the action is done
+          break;
         }
 
         if (currentValue) {
