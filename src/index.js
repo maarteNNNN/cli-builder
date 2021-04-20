@@ -234,9 +234,6 @@ class REPLClient {
           // Add the command again
           this.commands.help = help;
 
-          // TODO: when using help or --help the program exits normally, with -h it loops over it's internals, so we need to force exit...
-          this.exit(0);
-
           // Return because the action is done
           break;
         }
