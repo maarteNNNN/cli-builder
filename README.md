@@ -24,7 +24,7 @@ Be sure to take a look at `bin/example-cli.js`
 
 Instantiate a new CLI with `new REPLClient({ ...options })` `REPL` stands for `Read Eval Print Loop`
 
-defining an `commands` Object as shown below in [below](#Commands+example)
+defining an `commands` Object as shown below in [below](#commands-example)
 
 ```js
 cli.run(commands);
@@ -104,7 +104,7 @@ Help is dynamically mounted to the `commands` object. It generates a function wh
 
 **NOTE**
 
-Running is going through the object and should be written as arguments the following way: `deep nesting works as command` for the [example above](Commands+example) (It executes the function or the `execute` child function in case help wants to be added).
+Running is going through the object and should be written as arguments the following way: `deep nesting works as command` for the [example above](#commands-example) (It executes the function or the `execute` child function in case help wants to be added).
 `deep nesting works as command help` (executes `help` child function in case it's available)
 
 ---
