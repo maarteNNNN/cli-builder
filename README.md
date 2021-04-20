@@ -3,6 +3,7 @@
 [API Docs](API.md)
 
 ## Trying out an example
+
 This example can be found in `bin/example-cli.js`
 
 ```sh
@@ -127,6 +128,8 @@ The CLI (`REPLCient`) object is passed to the actions functions by [`Function.pr
 
 The `bindActionArgs` are passed via [`Function.prototype.bind`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind) as well. Except if an argument is passed in the commands object function Eg.
 
+---
+
 ```js
 someFunctionCmd: {
   // CLI as this will be available but bindActionArgs won't be as argument replaces them
@@ -158,12 +161,12 @@ const actions = {
   }
 }
 
-// Binding below array to `options.bindActionArgs` in `new CmdInterface({ ...options })`
+// Binding below array to `options.bindActionArgs` in `new REPLClient({ ...options })`
 const options = {
   bindActionArgs = [123, () => console.log('function executed'), 'a string', 23123]
 }
 
-const cli = new CmdInterface(options)
+const cli = new REPLClient(options)
 
 const commands = {
   // No arguments are passed here, they are mounted dynamically
