@@ -45,6 +45,8 @@ class REPLClient {
     this.actions = {};
 
     this.paginationActive = false;
+
+    this.interactive = true
   }
 
   /**
@@ -178,14 +180,11 @@ class REPLClient {
    * @private
    */
   async _interactiveCmd() {
-    const interactive = async (command = null) => {
-      command = await this.promptInput('>');
-      if (command) return Promise.resolve(command);
-      if (!command) command = await interactive(command);
-      return Promise.resolve(command);
-    };
-    const command = await interactive();
-    await this._execCmd(command);
+    while(this.interactive) {
+      const command = await this.promptInput('>');
+      if(!command) continue
+      await this._execCmd(command);
+    }
   }
 
   /**
@@ -202,9 +201,6 @@ class REPLClient {
    * @private
    */
   async _execCmd(cmd) {
-    // If no input is provided
-    // if (cmd === '' && this.options.interactive) await this._interactiveCmd();
-
     // If interactive make the cmd an array to loop over
     if (cmd.includes(' ')) cmd = cmd.split(' ');
 
@@ -285,8 +281,6 @@ class REPLClient {
     } catch (e) {
       this._invalidCommand(e.message);
     }
-
-    if (this.options.interactive) await this._interactiveCmd();
   }
 
   /**
@@ -353,6 +347,7 @@ class REPLClient {
     if (this.options.interactive && !override) return;
     if (this.paginationActive) return;
     if (this.testing) return;
+    this.interactive = false
     process.exit(code);
   }
 
