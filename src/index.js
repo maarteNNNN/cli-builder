@@ -178,7 +178,13 @@ class REPLClient {
    * @private
    */
   async _interactiveCmd() {
-    const command = await this.promptInput('>');
+    const interactive = async (command = null) => {
+      command = await this.promptInput('>');
+      if (command) return Promise.resolve(command);
+      if (!command) command = await interactive(command);
+      return Promise.resolve(command);
+    };
+    const command = await interactive();
     await this._execCmd(command);
   }
 
@@ -197,7 +203,7 @@ class REPLClient {
    */
   async _execCmd(cmd) {
     // If no input is provided
-    if (cmd === '' && this.options.interactive) await this._interactiveCmd();
+    // if (cmd === '' && this.options.interactive) await this._interactiveCmd();
 
     // If interactive make the cmd an array to loop over
     if (cmd.includes(' ')) cmd = cmd.split(' ');
@@ -280,7 +286,7 @@ class REPLClient {
       this._invalidCommand(e.message);
     }
 
-    if (this.options.interactive) this._interactiveCmd();
+    if (this.options.interactive) await this._interactiveCmd();
   }
 
   /**
