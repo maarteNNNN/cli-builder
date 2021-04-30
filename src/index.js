@@ -183,6 +183,7 @@ class REPLClient {
     while(this.interactive) {
       const command = await this.promptInput('>');
       if(!command) continue
+      this.argv._ = command.split(' ')
       await this._execCmd(command);
     }
   }
