@@ -6,7 +6,7 @@ const prompt = inquirer.createPromptModule();
 // TODO: Implement an automatic help header with interactive and non-interactive usage, when using help non-interactively
 class REPLClient {
   /**
-   * Instanciate the cli
+   * Instantiate the CLI
    * @param {Object} options options
    * @param {Boolean} [options.enableInteractive=true] Allow interactive mode
    * @param {Array<String>} [options.exceptions=[]] The ability to explicitely not execute code before the actual command. E.g. an API call.
@@ -457,7 +457,7 @@ class REPLClient {
   /**
    * Prompt wrapper function
    * @param {String} message Prompt message
-   * @param {Boolean} secret When true input is hidden
+   * @param {Boolean} [secret] When true input is hidden
    * @returns {string} Value given to prompt
    * @async
    */
@@ -501,8 +501,8 @@ class REPLClient {
    * Confirmation Prompt
    * @param {String} message Message of confirmation
    * @param {Array} [choices=[]] Choices to list in the prompt
-   * @param {Object} options
-   * @param {any} options.default Default of confirmation
+   * @param {Object} [options]
+   * @param {any} [options.default] Default of confirmation
    * @returns {string} Value given to prompt
    * @async
    */
