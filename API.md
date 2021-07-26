@@ -1,3 +1,6 @@
+Debugger listening on ws://127.0.0.1:33565/7cc33f34-4935-41bd-a275-e60c0ac617cf
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
 <a name="REPLClient"></a>
 
 ## REPLClient
@@ -12,14 +15,14 @@
     * [.pagination(output, pageInfo, [increments], [fn], [args])](#REPLClient+pagination) ⇒ <code>function</code> \| <code>null</code>
     * [.camelCaseToKebab(str)](#REPLClient+camelCaseToKebab) ⇒ <code>String</code>
     * [.kebabCaseToCamel(str)](#REPLClient+kebabCaseToCamel) ⇒ <code>String</code>
-    * [.promptInput(message, secret)](#REPLClient+promptInput) ⇒ <code>string</code>
+    * [.promptInput(message, [secret])](#REPLClient+promptInput) ⇒ <code>string</code>
     * [.promptConfirm(message, options)](#REPLClient+promptConfirm) ⇒ <code>Boolean</code>
-    * [.promptList(message, [choices], options)](#REPLClient+promptList) ⇒ <code>string</code>
+    * [.promptList(message, [choices], [options])](#REPLClient+promptList) ⇒ <code>string</code>
 
 <a name="new_REPLClient_new"></a>
 
 ### new REPLClient(options)
-Instanciate the cli
+Instantiate the CLI
 
 
 | Param | Type | Default | Description |
@@ -136,7 +139,7 @@ Converts kebab-case to camelCase
 
 <a name="REPLClient+promptInput"></a>
 
-### replClient.promptInput(message, secret) ⇒ <code>string</code>
+### replClient.promptInput(message, [secret]) ⇒ <code>string</code>
 Prompt wrapper function
 
 **Kind**: instance method of [<code>REPLClient</code>](#REPLClient)  
@@ -145,7 +148,7 @@ Prompt wrapper function
 | Param | Type | Description |
 | --- | --- | --- |
 | message | <code>String</code> | Prompt message |
-| secret | <code>Boolean</code> | When true input is hidden |
+| [secret] | <code>Boolean</code> | When true input is hidden |
 
 <a name="REPLClient+promptConfirm"></a>
 
@@ -163,7 +166,7 @@ Confirmation Prompt
 
 <a name="REPLClient+promptList"></a>
 
-### replClient.promptList(message, [choices], options) ⇒ <code>string</code>
+### replClient.promptList(message, [choices], [options]) ⇒ <code>string</code>
 Confirmation Prompt
 
 **Kind**: instance method of [<code>REPLClient</code>](#REPLClient)  
@@ -173,6 +176,7 @@ Confirmation Prompt
 | --- | --- | --- | --- |
 | message | <code>String</code> |  | Message of confirmation |
 | [choices] | <code>Array</code> | <code>[]</code> | Choices to list in the prompt |
-| options | <code>Object</code> |  |  |
-| options.default | <code>any</code> |  | Default of confirmation |
+| [options] | <code>Object</code> |  |  |
+| [options.default] | <code>any</code> |  | Default of confirmation |
 
+Waiting for the debugger to disconnect...
