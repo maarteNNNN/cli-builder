@@ -80,7 +80,9 @@ class REPLClient {
               .join('')} ${description}`,
           );
         } else {
-          console.log(`\n\x1b[1mCommand help:\x1b[0m\n${description}\n\n\x1b[1mAdditional information, parameters, arguments, flags or options:\x1b[0m`);
+          console.log(
+            `\n\x1b[1mCommand help:\x1b[0m\n${description}\n\n\x1b[1mAdditional information, parameters, arguments, flags or options:\x1b[0m`,
+          );
         }
 
         if (Array.isArray(options)) {
@@ -277,8 +279,9 @@ class REPLClient {
             accumulator = accumulator[currentValue];
 
             if (typeof accumulator === 'function' && !nextValue) {
-              await accumulator.call(this, { argument: currentValue, options });
+              await accumulator.call(this, { argument: null, options });
             } else if (typeof accumulator.execute === 'function') continue;
+            else if (options.help || options.h) continue;
             else if (!accumulator.hasOwnProperty(nextValue)) {
               throw new Error('command is invalid and needs more arguments');
             }
