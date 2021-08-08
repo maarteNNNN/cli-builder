@@ -1,4 +1,4 @@
-Debugger listening on ws://127.0.0.1:44023/22a3b8f9-0d96-43f9-b8e2-ebebaa7c08e1
+Debugger listening on ws://127.0.0.1:34997/2d00c80d-2f47-44cd-9ec5-ef0b6c665518
 For help, see: https://nodejs.org/en/docs/inspector
 Debugger attached.
 <a name="REPLClient"></a>
@@ -8,7 +8,7 @@ Debugger attached.
 
 * [REPLClient](#REPLClient)
     * [new REPLClient(options)](#new_REPLClient_new)
-    * [.run([commands])](#REPLClient+run)
+    * [.run([commands], [options])](#REPLClient+run)
     * [.successLog(successMsg, [prefix], [noExit])](#REPLClient+successLog)
     * [.errorLog(errorMsg, [prefix], [noExit], [force])](#REPLClient+errorLog)
     * [.exit([code], [override])](#REPLClient+exit)
@@ -38,7 +38,7 @@ Instantiate the CLI
 
 <a name="REPLClient+run"></a>
 
-### replClient.run([commands])
+### replClient.run([commands], [options])
 Runs the cli interface
 
 **Kind**: instance method of [<code>REPLClient</code>](#REPLClient)  
@@ -46,6 +46,7 @@ Runs the cli interface
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [commands] | <code>Object</code> | <code>{}</code> | Command object with function to execute |
+| [options] | <code>Object</code> | <code>{}</code> | Command object with function to execute |
 
 <a name="REPLClient+successLog"></a>
 
