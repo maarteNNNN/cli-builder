@@ -162,7 +162,7 @@ describe('REPL Client tests', () => {
 
       const commands = {
         command: {
-          execute: () => {},
+          execute: ({ argument, options }) => console.log(argument, options),
           help: 'Testing this help',
           input: '<app-name>',
         },
@@ -185,8 +185,8 @@ describe('REPL Client tests', () => {
 
       const commands = {
         paramt: {
-          execute: (test) => {
-            chai.expect(test).to.be.eql(param);
+          execute: ({ argument }) => {
+            chai.expect(argument).to.be.eql(param);
           },
           help: 'Testing this help',
           input: '<app-name>',
@@ -199,34 +199,32 @@ describe('REPL Client tests', () => {
     }
   });
 
-  it('it should run the parent execute if only help is defined', async () => {
+  it('it should pass on options', async () => {
     try {
+      const opts = {
+        test: 'pass this on',
+        test2: 'pass this on',
+      }
+
       const testCli = await initiateCli(
         { ...exampleOptions },
         {
           _: ['wallet', 'child'],
-          help: true,
+          ...opts
         },
       );
 
       const commands = {
         wallet: {
-          execute: (test) => {
-            chai.expect(test).to.be.eql('child');
+          execute: ({ argument, options }) => {
+            chai.expect(options.test).to.be.eql(opts.test);
           },
-          child: {
-            help: 'Testing this help',
-          }
         },
       };
 
       await testCli.run(commands);
     } catch (e) {
-      chai
-        .expect(e.message)
-        .to.be.eql(
-          'Command has parameter which is invalid',
-        );
+      chai.expect(e).to.not.throw();
     }
   });
 });

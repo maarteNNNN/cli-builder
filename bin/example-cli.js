@@ -15,12 +15,11 @@ const commands = {
     execute: () => console.log('this is the test run'),
     help: 'help of test',
     testing: {
-      execute: (InputArgPassedToFunction) =>
-        console.log(InputArgPassedToFunction),
+      execute: ({ argument, options }) =>
+        console.log('ARGUMENT: ', argument, '\nOPTIONS: ', options),
       help: 'testing help',
-      input: '<arg-to-pass-to-execute-function>', // arg passed to execute function
+      input: '<arg-to-pass-to-execute-function>', // argument and options are passed as an object passed to execute function
       // cmd test testing IAMPASSEDTOFUNCTION -f
-      // -f argument can be found by using this.argv.f inside the action
       options: [{ option: 'f', help: 'Follow the logs' }],
     },
     testing2: {
@@ -62,9 +61,10 @@ const commands = {
     'any-yet-unknown-property': {
       help: 'Help for ANY UNKOWN PROPERTY',
     },
-    async execute(param) {
+    async execute({ argument, options }) {
       console.log(this); // Mounts the REPLClient dynamically
       console.log(param); // Passes the last given argument/param dynamically
+      console.log(options); // Passes the last given options/flags dynamically
     },
   },
 };

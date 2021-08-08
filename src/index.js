@@ -46,7 +46,7 @@ class REPLClient {
 
     this.paginationActive = false;
 
-    this.interactive = true
+    this.interactive = true;
   }
 
   /**
@@ -68,15 +68,21 @@ class REPLClient {
 
     this.helpArray.forEach(
       ({ command, description, options = null, input = null }) => {
-        const commandCharacterCount =
-          command.length + (input ? input.length : -1);
+        const commandCharacterCount = command
+          ? command.length + (input ? input.length : -1)
+          : 0;
         const size = 100 - commandCharacterCount;
 
-        console.log(
-          `${command}${input ? ' ' + input : ''} ${Array(size)
-            .fill(' ')
-            .join('')} ${description}`,
-        );
+        if (command) {
+          console.log(
+            `${command}${input ? ' ' + input : ''} ${Array(size)
+              .fill(' ')
+              .join('')} ${description}`,
+          );
+        } else {
+          console.log(`\n\x1b[1mCommand help:\x1b[0m\n${description}\n\n\x1b[1mAdditional information, parameters, arguments, flags or options:\x1b[0m`);
+        }
+
         if (Array.isArray(options)) {
           for (let i = 0; i < options.length; i++) {
             const { option, help } = options[i];
@@ -100,6 +106,7 @@ class REPLClient {
   _getHelpCommands(
     accumulator,
     commands,
+    parentCommand,
     previousValue = null,
     previousAccumulator = null,
   ) {
@@ -119,13 +126,14 @@ class REPLClient {
           // Add the command if is array join it eg. `some deep nested command` or key as string when it is in the root object
           command: Array.isArray(previousValue)
             ? this.camelCaseToKebab(previousValue.join(' '))
-            : this.camelCaseToKebab(key),
+            : this.camelCaseToKebab(key === 'help' ? null : key),
           description:
             typeof currentValue === 'function'
               ? 'No description available'
               : currentValue,
           options: previousAccumulator.options,
           input: previousAccumulator.input,
+          parentCommand: key === 'help',
         });
       } else {
         // Mount an array to get previous commands to display it nicely eg. `some deep nested command`
@@ -139,6 +147,7 @@ class REPLClient {
           this._getHelpCommands(
             currentValue,
             commands,
+            parentCommand,
             previousValues,
             previousAccumulator,
           );
@@ -150,6 +159,7 @@ class REPLClient {
   /**
    * Runs the cli interface
    * @param {Object} [commands={}] Command object with function to execute
+   * @param {Object} [options={}] Command object with function to execute
    */
   async run(commands = {}) {
     // BIND ARGS TO FUNCTIONS
@@ -180,10 +190,10 @@ class REPLClient {
    * @private
    */
   async _interactiveCmd() {
-    while(this.interactive) {
+    while (this.interactive) {
       const command = await this.promptInput('>');
-      if(!command) continue
-      this.argv._ = command.split(' ')
+      if (!command) continue;
+      this.argv._ = command.split(' ');
       await this._execCmd(command);
     }
   }
@@ -193,15 +203,16 @@ class REPLClient {
    * @private
    */
   async _commandCmd() {
-    const command = [].concat(this.argv._, Object.keys(this.argv).slice(1));
-    await this._execCmd(command);
+    const options = { ...this.argv };
+    delete options._;
+    await this._execCmd(this.argv._, options);
   }
 
   /**
    * @async
    * @private
    */
-  async _execCmd(cmd) {
+  async _execCmd(cmd, options = {}) {
     // If interactive make the cmd an array to loop over
     if (cmd.includes(' ')) cmd = cmd.split(' ');
 
@@ -210,6 +221,10 @@ class REPLClient {
       let accumulator = this.commands;
 
       for (let i = 0; i < commands.length + 1; i++) {
+        const previousValue = commands[i - 1]
+          ? this.kebabCaseToCamel(commands[i - 1])
+          : null;
+
         const currentValue = commands[i]
           ? this.kebabCaseToCamel(commands[i])
           : null;
@@ -217,21 +232,18 @@ class REPLClient {
           ? this.kebabCaseToCamel(commands[i + 1])
           : null;
 
-        if (typeof accumulator.execute === 'function' && !currentValue) {
-          await accumulator.execute.call(
-            this,
-            this.camelCaseToKebab(currentValue),
-          );
-          if (this.options.interactive) break;
-        }
-
-        if (currentValue === 'help' || currentValue === 'h') {
+        if (
+          !currentValue &&
+          (options.hasOwnProperty('h') ||
+            options.hasOwnProperty('help') ||
+            (this.options.interactive && currentValue === 'help'))
+        ) {
           const { help } = this.commands;
 
           // Delete help out of command to not display it in the help command.
           delete this.commands.help;
 
-          this._getHelpCommands(accumulator, commands);
+          this._getHelpCommands(accumulator, commands, previousValue);
           this._logHelpCommands();
 
           // Add the command again
@@ -241,36 +253,41 @@ class REPLClient {
           break;
         }
 
+        if (typeof accumulator.execute === 'function' && !currentValue) {
+          await accumulator.execute.call(this, {
+            argument: this.camelCaseToKebab(currentValue),
+            options,
+          });
+          if (this.options.interactive) break;
+        }
+
         if (currentValue) {
           if (accumulator.hasOwnProperty(currentValue)) {
             if (
               accumulator[currentValue].hasOwnProperty('help') &&
               !accumulator[currentValue].hasOwnProperty('execute')
             ) {
-              await accumulator.execute.call(
-                this,
-                this.camelCaseToKebab(currentValue),
-              );
+              await accumulator.execute.call(this, {
+                argument: this.camelCaseToKebab(currentValue),
+                options,
+              });
               if (this.options.interactive) break;
             }
 
             accumulator = accumulator[currentValue];
 
             if (typeof accumulator === 'function' && !nextValue) {
-              await accumulator();
+              await accumulator.call(this, { argument: currentValue, options });
             } else if (typeof accumulator.execute === 'function') continue;
-            else if (nextValue === 'help') continue;
             else if (!accumulator.hasOwnProperty(nextValue)) {
               throw new Error('command is invalid and needs more arguments');
             }
-          } else if (typeof accumulator['--' + currentValue] === 'function') {
-            await accumulator['--' + currentValue]();
           } else {
             if (typeof accumulator.execute === 'function') {
-              await accumulator.execute.call(
-                this,
-                this.camelCaseToKebab(currentValue),
-              );
+              await accumulator.execute.call(this, {
+                argument: this.camelCaseToKebab(currentValue),
+                options,
+              });
               break;
             } else if (this.options.bindActionArgs.length) {
               throw new Error('Command has parameter which is invalid.');
@@ -280,6 +297,7 @@ class REPLClient {
         }
       }
     } catch (e) {
+      console.error(e);
       this._invalidCommand(e.message);
     }
   }
@@ -348,7 +366,7 @@ class REPLClient {
     if (this.options.interactive && !override) return;
     if (this.paginationActive) return;
     if (this.testing) return;
-    this.interactive = false
+    this.interactive = false;
     process.exit(code);
   }
 

@@ -39,11 +39,11 @@ const commands = {
     execute: () => console.log('this is the test run'),
     help: 'help of test',
     testing: {
-      execute: (InputArgPassedToFunction) => console.log(InputArgPassedToFunction),
+      execute: ({ argument, options }) =>
+        console.log('ARGUMENT: ', argument, '\nOPTIONS: ', options),
       help: 'testing help',
-      input: '<arg-to-pass-to-execute-function>', // arg passed to execute function
+      input: '<arg-to-pass-to-execute-function>', // argument and options are passed as an object passed to execute function
       // cmd test testing IAMPASSEDTOFUNCTION -f
-      // -f argument can be found by using this.argv.f inside the action
       options: [{ option: 'f', help: 'Follow the logs' }],
     },
     testing2: {
@@ -60,36 +60,38 @@ const commands = {
       works: {
         as: {
           // Without help
-          command: () => console.log('to run this type `deep nesting works as command`')
+          command: () =>
+            console.log('to run this type `deep nesting works as command`'),
           // Or with help
-          command: {
-            // this get executed as `deep nesting works as command`
-            execute: () => console.log('to run this type `deep nesting works as command`'),
-            // this get executed as `deep nesting works as command help`
-            help: 'help of command'
-          }
-        }
-      }
-    }
+          // command: {
+          //   // this get executed as `deep nesting works as command`
+          //   execute: () => console.log('to run this type `deep nesting works as command`'),
+          //   // this get executed as `deep nesting works as command help`
+          //   help: 'help of command'
+          // }
+        },
+      },
+    },
   },
   runSomeFunction: async () => {
     // DO SOME INSANE LOGIC HERE
   },
   // A more comprehensive example below titled: Defining help with only one execute function
-  exampleOneExecute: {
+  exampleWithOneExecute: {
     knownCommand: {
-      help: 'Help for this known command'
+      help: 'Help for this known command',
     },
     // Show the user there are other commands available
     'any-yet-unknown-property': {
       help: 'Help for ANY UNKOWN PROPERTY',
     },
-    async execute(param) {
-      console.log(this) // Mounts the REPLClient dynamically
-      console.log(param) // Passes the last given param dynamically
-    }
-  }
-}
+    async execute({ argument, options }) {
+      console.log(this); // Mounts the REPLClient dynamically
+      console.log(param); // Passes the last given argument/param dynamically
+      console.log(options); // Passes the last given options/flags dynamically
+    },
+  },
+};
 ```
 
 ---
@@ -105,7 +107,7 @@ Help is dynamically mounted to the `commands` object. It generates a function wh
 **NOTE**
 
 Running is going through the object and should be written as arguments the following way: `deep nesting works as command` for the [example above](#commands-example) (It executes the function or the `execute` child function in case help wants to be added).
-`deep nesting works as command help` (executes `help` child function in case it's available)
+`deep nesting works as command --help` (executes `--help or -h` child function in case it's available)
 
 ---
 
