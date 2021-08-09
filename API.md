@@ -1,4 +1,4 @@
-Debugger listening on ws://127.0.0.1:44439/0092b24c-a259-485f-bf12-0a3c9a02e1cd
+Debugger listening on ws://127.0.0.1:45101/e4cc5a1b-a8f6-4511-bbe8-c90c5d1b3b11
 For help, see: https://nodejs.org/en/docs/inspector
 Debugger attached.
 <a name="REPLClient"></a>
@@ -33,6 +33,7 @@ Instantiate the CLI
 | [options.helpHeader] | <code>String</code> |  | Header to show in help |
 | [options.helpFooter] | <code>String</code> |  | Footer to show in help |
 | [options.binCommand] | <code>String</code> |  | If error it will show how to access the help command |
+| [options.logStackErrorMessages] | <code>Boolean</code> |  | For debug purposes |
 | [options.argv] | <code>String</code> |  | Manually pass arguments to cli (used for testing) |
 | [options.actions] | <code>Object.&lt;String, function()&gt;</code> | <code>{}</code> | Actions to mount to the CLI |
 
