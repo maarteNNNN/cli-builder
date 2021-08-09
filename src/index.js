@@ -230,15 +230,21 @@ class REPLClient {
         const currentValue = commands[i]
           ? this.kebabCaseToCamel(commands[i])
           : null;
+
         const nextValue = commands[i + 1]
           ? this.kebabCaseToCamel(commands[i + 1])
           : null;
 
         if (
-          !currentValue &&
-          (options.hasOwnProperty('h') ||
-            options.hasOwnProperty('help') ||
-            (this.options.interactive && currentValue === 'help'))
+          // If it isn't interactive
+          (!this.options.interactive &&
+            !currentValue &&
+            (options.hasOwnProperty('h') || options.hasOwnProperty('help'))) ||
+          // If it is interactivecli
+          (this.options.interactive &&
+            (currentValue === 'help' ||
+              currentValue === '-h' ||
+              currentValue === '--help'))
         ) {
           const { help } = this.commands;
 
@@ -274,7 +280,7 @@ class REPLClient {
                 options,
               });
               if (this.options.interactive) break;
-              return
+              return;
             }
 
             accumulator = accumulator[currentValue];
@@ -469,6 +475,7 @@ class REPLClient {
    */
   kebabCaseToCamel(str) {
     if (!str) return;
+    if (str.split('')[0] === '-') return str;
     if (typeof str !== 'string')
       throw new TypeError('Not a string or no string given');
     return str.includes('--')
