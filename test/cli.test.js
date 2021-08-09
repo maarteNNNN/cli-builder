@@ -204,13 +204,13 @@ describe('REPL Client tests', () => {
       const opts = {
         test: 'pass this on',
         test2: 'pass this on',
-      }
+      };
 
       const testCli = await initiateCli(
         { ...exampleOptions },
         {
           _: ['wallet', 'child'],
-          ...opts
+          ...opts,
         },
       );
 
@@ -218,6 +218,30 @@ describe('REPL Client tests', () => {
         wallet: {
           execute: ({ argument, options }) => {
             chai.expect(options.test).to.be.eql(opts.test);
+          },
+        },
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai.expect(e).to.not.throw();
+    }
+  });
+
+  it('it should not throw on known property without execution', async () => {
+    try {
+      const testCli = await initiateCli(
+        { ...exampleOptions },
+        {
+          _: ['wallet', 'known-command'],
+        },
+      );
+
+      const commands = {
+        wallet: {
+          execute: ({ argument, options }) => {},
+          knownCommand: {
+            help: 'test this help',
           },
         },
       };

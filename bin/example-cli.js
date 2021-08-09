@@ -58,12 +58,13 @@ const commands = {
       help: 'Help for this known command',
     },
     // Show the user there are other commands available
+    // This won't work if it has an execute!!! It needs to be camelcase for it to call execute
     'any-yet-unknown-property': {
       help: 'Help for ANY UNKOWN PROPERTY',
     },
     async execute({ argument, options }) {
       console.log(this); // Mounts the REPLClient dynamically
-      console.log(param); // Passes the last given argument/param dynamically
+      console.log(argument); // Passes the last given argument/param dynamically
       console.log(options); // Passes the last given options/flags dynamically
     },
   },

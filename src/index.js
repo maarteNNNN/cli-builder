@@ -274,6 +274,7 @@ class REPLClient {
                 options,
               });
               if (this.options.interactive) break;
+              return
             }
 
             accumulator = accumulator[currentValue];
