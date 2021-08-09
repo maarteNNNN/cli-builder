@@ -13,6 +13,7 @@ class REPLClient {
    * @param {String} [options.helpHeader] Header to show in help
    * @param {String} [options.helpFooter] Footer to show in help
    * @param {String} [options.binCommand] If error it will show how to access the help command
+   * @param {Boolean} [options.logStackErrorMessages] For debug purposes
    * @param {String} [options.argv] Manually pass arguments to cli (used for testing)
    * @param {Object.<String, Function>} [options.actions={}] Actions to mount to the CLI
    */
@@ -307,7 +308,7 @@ class REPLClient {
         }
       }
     } catch (e) {
-      console.error(e);
+      if (this.options.logStackErrorMessages) console.error(e);
       this._invalidCommand(e.message);
     }
   }

@@ -7,6 +7,7 @@ const cli = new REPLClient({
   interactive: true,
   helpFooter: 'This is shown in the footer',
   helpHeader: 'This is shown in the header',
+  logStackErrorMessages: true,
 });
 
 // DO NOT ADD HELP TO THE ROOT OBJECT. THIS IS DYNAMICALLY MOUNTED
