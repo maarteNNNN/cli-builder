@@ -14,6 +14,7 @@ class REPLClient {
    * @param {String} [options.helpFooter] Footer to show in help
    * @param {String} [options.binCommand] If error it will show how to access the help command
    * @param {Boolean} [options.logStackErrorMessages] For debug purposes
+   * @param {Number} [options.tabSize=15] Tab size between command and help
    * @param {String} [options.argv] Manually pass arguments to cli (used for testing)
    * @param {Object.<String, Function>} [options.actions={}] Actions to mount to the CLI
    */
@@ -25,6 +26,7 @@ class REPLClient {
 
     // OPTIONS
     this.options = options;
+    this.options.tabSize = options.tabSize || 15;
 
     if (this.options.enableInteractive == undefined)
       this.options.enableInteractive = true;
@@ -52,6 +54,7 @@ class REPLClient {
 
   /**
    * @private
+   * @description Discover whether it's interactively ran or non-interactively
    */
   _isInteractive() {
     this.options.interactive =
@@ -63,8 +66,10 @@ class REPLClient {
 
   /**
    * @private
+   * @description Log commands accordingly
    */
   _logHelpCommands() {
+    // Log help header is there is any
     if (this.options.helpHeader) console.log(this.options.helpHeader);
 
     this.helpArray.forEach(
@@ -72,32 +77,69 @@ class REPLClient {
         const commandCharacterCount = command
           ? command.length + (input ? input.length : -1)
           : 0;
-        const size = 100 - commandCharacterCount;
+        const size = this.options.tabSize * 4 - commandCharacterCount;
 
+        /**
+         * If command log it with its discription
+         * If log additional header for command specific help
+         * e.g. cli-builder testing -h
+         * will output the else if statement
+         */
         if (command) {
           console.log(
             `${command}${input ? ' ' + input : ''} ${Array(size)
               .fill(' ')
               .join('')} ${description}`,
           );
-        } else {
+        } else if (!options) {
           console.log(
             `\n\x1b[1mCommand help:\x1b[0m\n${description}\n\n\x1b[1mAdditional information, parameters, arguments, flags or options:\x1b[0m`,
           );
         }
 
+        /**
+         * Log the options related to the command help
+         * Options is an object with option and help
+         * Option can be a string or object with values short and long.
+         *    Short is for example -v
+         *    Long is for example --version
+         *    Both of these have the same help description
+         * Help only accepts a string
+         *    It displays what the command does.
+         */
         if (Array.isArray(options)) {
           for (let i = 0; i < options.length; i++) {
             const { option, help } = options[i];
-            const optionSize = 100 - option.length - 3;
-            console.log(
-              `   -${option} ${Array(optionSize).fill(' ').join('')} ${help}`,
-            );
+
+            // Simulate tab spaces
+            const tab = 4;
+            const size = this.options.tabSize * 4;
+
+            if (typeof option === 'object') {
+              const optionSize =
+                size - option.short.length - option.long.length - tab;
+
+              console.log(
+                `${command ? '    ' : ''}-${option.short}, --${
+                  option.long
+                } ${Array(optionSize).fill(' ').join('')} ${help}`,
+              );
+            } else {
+              const optionSize = size - option.length - tab;
+
+              console.log(
+                `${command ? '    ' : ''}-${option} ${Array(optionSize)
+                  .fill(' ')
+                  .join('')} ${help}`,
+              );
+            }
           }
         }
       },
     );
 
+    // Log help footer is there is any
+    console.log('');
     if (this.options.helpFooter) console.log(this.options.helpFooter);
 
     this.helpArray = [];
@@ -105,20 +147,20 @@ class REPLClient {
 
   /**
    * @private
+   * @description Build an array to later on loop over and log them
    */
   _getHelpCommands(
     accumulator,
     commands,
     parentCommand,
     previousValue = null,
-    previousAccumulator = null,
+    root = true,
   ) {
     const keys = Object.keys(accumulator);
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       const currentValue = accumulator[key];
-      previousAccumulator = accumulator;
 
       if (
         (typeof currentValue === 'string' && key === 'help') ||
@@ -134,12 +176,18 @@ class REPLClient {
             typeof currentValue === 'function'
               ? 'No description available'
               : currentValue,
-          options: previousAccumulator.options,
-          input: previousAccumulator.input,
+          options: !root ? accumulator.options : null,
+          input: !root ? accumulator.input : null,
           parentCommand: key === 'help',
         });
+
+        continue;
       } else {
-        // Mount an array to get previous commands to display it nicely eg. `some deep nested command`
+        /**
+         * Mount an array to get previous commands to display it nicely eg. `some deep nested command`
+         * This used when using nested commands
+         * TODO: Explain better what this actually does
+         */
         if (key !== 'options' && key !== 'input') {
           const previousValues = previousValue
             ? Array.isArray(previousValue)
@@ -152,8 +200,17 @@ class REPLClient {
             commands,
             parentCommand,
             previousValues,
-            previousAccumulator,
+            false,
           );
+
+          continue;
+        }
+
+        /**
+         * Display options on the root of the object
+         */
+        if (key === 'options' && root) {
+          this.helpArray.push({ options: accumulator.options });
         }
       }
     }
@@ -163,9 +220,12 @@ class REPLClient {
    * Runs the cli interface
    * @param {Object} [commands={}] Command object with function to execute
    * @param {Object} [options={}] Command object with function to execute
+   * @description This is the initial entry to initialize the cli REPLClient.run({ commands })
    */
   async run(commands = {}) {
-    // BIND ARGS TO FUNCTIONS
+    /**
+     * bindActionArgs are arguments that you want to pass to any function
+     */
     if (this.options.actions) {
       for (let i = 0; i < Object.keys(this.options.actions).length; i++) {
         const key = Object.keys(this.options.actions)[i];
@@ -182,7 +242,11 @@ class REPLClient {
     // FORCE UPDATE OF INTERACTIVE
     this._isInteractive();
 
-    // EXECUTE CLI
+    /**
+     * Runs the cli in interactive or non-interactive mode.
+     * E.g. `cli-builder` will run interactive (if enabled in the options)
+     * E.g. `cli-builder testing` will run in non-interactive mode
+     */
     this.options.interactive
       ? await this._interactiveCmd()
       : await this._commandCmd();
@@ -191,6 +255,7 @@ class REPLClient {
   /**
    * @async
    * @private
+   * @description Loop over command until an exit or process.exit takes place
    */
   async _interactiveCmd() {
     while (this.interactive) {
@@ -204,6 +269,7 @@ class REPLClient {
   /**
    * @async
    * @private
+   * @description Executes a command
    */
   async _commandCmd() {
     const options = { ...this.argv };
@@ -214,6 +280,7 @@ class REPLClient {
   /**
    * @async
    * @private
+   * @description Both interactive and non-interactive mode execute this function.
    */
   async _execCmd(cmd, options = {}) {
     // If interactive make the cmd an array to loop over
@@ -236,6 +303,11 @@ class REPLClient {
           ? this.kebabCaseToCamel(commands[i + 1])
           : null;
 
+        /**
+         * If non-interactive and -h or --help is provided
+         * If interactive and help, -h or --help is provided
+         * Construct the help output
+         */
         if (
           // If it isn't interactive
           (!this.options.interactive &&
@@ -262,6 +334,11 @@ class REPLClient {
           break;
         }
 
+        /**
+         * If there isn't a currentValue and execute is part of the current accumulator then execute it.
+         * Attach this so we can use it inside the function call
+         * If interactive break and continue the while loop
+         */
         if (typeof accumulator.execute === 'function' && !currentValue) {
           await accumulator.execute.call(this, {
             argument: this.camelCaseToKebab(currentValue),
@@ -270,8 +347,22 @@ class REPLClient {
           if (this.options.interactive) break;
         }
 
+        /**
+         * If currentValue
+         *    If accumulator has the currentValue
+         *      If accumulator has the currentValue and had a help property in the object
+         *      It doesn't have execute
+         *      run execute
+         *      I
+         */
         if (currentValue) {
           if (accumulator.hasOwnProperty(currentValue)) {
+            /**
+             * If there is help on a known command but no execute, execute the parent command's execute
+             * This is useful for e.g. extract a known property from an object
+             * e.g. cli-builder get object returns { foo: 'foo', bar: 'bar' }
+             * e.g. cli-builder get object foo returns foo
+             */
             if (
               accumulator[currentValue].hasOwnProperty('help') &&
               !accumulator[currentValue].hasOwnProperty('execute')
@@ -286,14 +377,43 @@ class REPLClient {
 
             accumulator = accumulator[currentValue];
 
+            /**
+             * If we're on the function execute it attach this and pass it options
+             * It shouldn't have an argument so we pass null
+             */
             if (typeof accumulator === 'function' && !nextValue) {
               await accumulator.call(this, { argument: null, options });
-            } else if (typeof accumulator.execute === 'function') continue;
-            else if (options.help || options.h) continue;
-            else if (!accumulator.hasOwnProperty(nextValue)) {
+              /**
+               * Continue if execute is a function
+               * Let the next loop handle it
+               */
+            } else if (typeof accumulator.execute === 'function') {
+              continue;
+              /**
+               * Continue if options.help or options.h is present
+               * Let the next loop handle it
+               */
+            } else if (options.help || options.h) {
+              continue;
+              /**
+               * If there isn't a nextValue throw and error
+               * Command is invalid and needs more arguments
+               */
+            } else if (!accumulator.hasOwnProperty(nextValue)) {
               throw new Error('command is invalid and needs more arguments');
             }
+            /**
+             * It doesn't have the currentValue in the accumulator.
+             * We presume it's an argument that needs to be passed to the function
+             */
           } else {
+            /**
+             * If the accumulator has execute and it's a function
+             * Execute it, give the currentValue
+             * Break the loop because we're done
+             * It will continue the while loop in interactive mode
+             * Or exit when non-interactive
+             */
             if (typeof accumulator.execute === 'function') {
               await accumulator.execute.call(this, {
                 argument: this.camelCaseToKebab(currentValue),

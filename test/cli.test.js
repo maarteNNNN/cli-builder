@@ -117,9 +117,56 @@ describe('REPL Client tests', () => {
           execute: () => {},
           help: 'Testing this help',
           options: [
-            { option: 'v', help: 'version displayed' },
-            { option: 's', help: 'version displayed' },
+            { option: 'v', help: 'v displayed' },
+            { option: 's', help: 's displayed' },
           ],
+        },
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai.expect(e).to.not.throw();
+    }
+  });
+
+  it('it should run help on a specific command with short and long possibilites', async () => {
+    try {
+      const testCli = await initiateCli(exampleOptions, {
+        _: ['command'],
+        help: true,
+      });
+
+      const commands = {
+        command: {
+          execute: () => {},
+          help: 'Testing this help',
+          options: [
+            { option: 'v', help: 'v displayed' },
+            { option: { short: 's', long: 'silly' }, help: 's displayed' },
+          ],
+        },
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai.expect(e).to.not.throw();
+    }
+  });
+
+  it('it should display version on help', async () => {
+    try {
+      const testCli = await initiateCli(exampleOptions, {
+        _: [],
+        help: true,
+      });
+
+      const commands = {
+        options: [
+          { option: { short: 'v', long: 'version' }, help: 'Display current version' },
+        ],
+        command: {
+          execute: () => {},
+          help: 'Testing this help',
         },
       };
 

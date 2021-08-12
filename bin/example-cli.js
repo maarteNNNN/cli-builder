@@ -8,10 +8,12 @@ const cli = new REPLClient({
   helpFooter: 'This is shown in the footer',
   helpHeader: 'This is shown in the header',
   logStackErrorMessages: true,
+  // tabSize: 20
 });
 
 // DO NOT ADD HELP TO THE ROOT OBJECT. THIS IS DYNAMICALLY MOUNTED
 const commands = {
+  options: [{ option: { short: 'v', long: 'version' }, help: 'Version' }],
   test: {
     execute: () => console.log('this is the test run'),
     help: 'help of test',
