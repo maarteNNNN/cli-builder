@@ -261,6 +261,8 @@ class REPLClient {
     while (this.interactive) {
       const command = await this.promptInput('>');
       if (!command) continue;
+      /^-{2}\b[a-z][a-z\d]{2,}\b(-[a-z\d]+)*/
+      debugger
       this.argv._ = command.split(' ');
       await this._execCmd(command);
     }

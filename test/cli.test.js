@@ -129,6 +129,33 @@ describe('REPL Client tests', () => {
     }
   });
 
+  it('it should run values with options as -- argument', async () => {
+    try {
+      const testCli = await initiateCli(exampleOptions, {
+        _: ['command'],
+        v: 0,
+        s: 100,
+      });
+
+      const commands = {
+        command: {
+          execute: () => {
+            console.log(testCli.argv.v, testCli.argv.s);
+          },
+          help: 'Testing this help',
+          options: [
+            { option: 'v', help: 'v displayed' },
+            { option: 's', help: 's displayed' },
+          ],
+        },
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai.expect(e).to.not.throw();
+    }
+  });
+
   it('it should run help on a specific command with short and long possibilites', async () => {
     try {
       const testCli = await initiateCli(exampleOptions, {
@@ -162,7 +189,10 @@ describe('REPL Client tests', () => {
 
       const commands = {
         options: [
-          { option: { short: 'v', long: 'version' }, help: 'Display current version' },
+          {
+            option: { short: 'v', long: 'version' },
+            help: 'Display current version',
+          },
         ],
         command: {
           execute: () => {},
