@@ -1,4 +1,4 @@
-Debugger listening on ws://127.0.0.1:45101/e4cc5a1b-a8f6-4511-bbe8-c90c5d1b3b11
+Debugger listening on ws://127.0.0.1:33829/c347abd0-5b7c-4cee-90c5-bae54b960a60
 For help, see: https://nodejs.org/en/docs/inspector
 Debugger attached.
 <a name="REPLClient"></a>
@@ -34,13 +34,14 @@ Instantiate the CLI
 | [options.helpFooter] | <code>String</code> |  | Footer to show in help |
 | [options.binCommand] | <code>String</code> |  | If error it will show how to access the help command |
 | [options.logStackErrorMessages] | <code>Boolean</code> |  | For debug purposes |
+| [options.tabSize] | <code>Number</code> | <code>15</code> | Tab size between command and help |
 | [options.argv] | <code>String</code> |  | Manually pass arguments to cli (used for testing) |
 | [options.actions] | <code>Object.&lt;String, function()&gt;</code> | <code>{}</code> | Actions to mount to the CLI |
 
 <a name="REPLClient+run"></a>
 
 ### replClient.run([commands], [options])
-Runs the cli interface
+This is the initial entry to initialize the cli REPLClient.run({ commands })
 
 **Kind**: instance method of [<code>REPLClient</code>](#REPLClient)  
 
