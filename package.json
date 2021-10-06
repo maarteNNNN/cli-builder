@@ -31,7 +31,7 @@
   "license": "MIT",
   "dependencies": {
     "fs-extra": "^10.0.0",
-    "inquirer": "^6.5.2",
+    "inquirer": "^8.2.0",
     "minimist": "^1.2.5"
   },
   "devDependencies": {
