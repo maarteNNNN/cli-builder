@@ -39,6 +39,6 @@
     "chai-like": "^1.1.1",
     "chai-things": "^0.2.0",
     "jsdoc-to-markdown": "^7.0.1",
-    "mocha": "^9.0.3"
+    "mocha": "^10.0.0"
   }
 }
