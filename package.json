@@ -28,7 +28,7 @@
   "author": "Maarten Coppens",
   "license": "MIT",
   "dependencies": {
-    "fs-extra": "^10.1.0",
+    "fs-extra": "^11.1.0",
     "inquirer": "^8.2.4",
     "minimist": "^1.2.6"
   },
