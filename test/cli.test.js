@@ -162,7 +162,10 @@ describe('REPL Client tests', () => {
 
       const commands = {
         options: [
-          { option: { short: 'v', long: 'version' }, help: 'Display current version' },
+          {
+            option: { short: 'v', long: 'version' },
+            help: 'Display current version',
+          },
         ],
         command: {
           execute: () => {},
@@ -296,6 +299,59 @@ describe('REPL Client tests', () => {
       await testCli.run(commands);
     } catch (e) {
       chai.expect(e).to.not.throw();
+    }
+  });
+
+  it('it correctly translates kebab-case to camelCase', async () => {
+    try {
+      const testCli = await initiateCli(
+        { ...exampleOptions },
+        {
+          _: ['testing-this', 'testing-a-smaller-argument'],
+          // help: true,
+        },
+      );
+
+      const commands = {
+        testingThis: {
+          testingASmallerArgument: {
+            execute: ({ argument, options }) => {},
+            help: 'test this help',
+          },
+        },
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai.expect(e).to.not.throw();
+    }
+  });
+
+  it('it throws if the kebab-case is off', async () => {
+    try {
+      const testCli = await initiateCli(
+        { ...exampleOptions },
+        {
+          //                        Wrong
+          _: ['testing-this', 'testing-asmaller-argument'],
+          // help: true,
+        },
+      );
+
+      const commands = {
+        testingThis: {
+          testingASmallerArgument: {
+            execute: ({ argument, options }) => {},
+            help: 'test this help',
+          },
+        },
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai
+        .expect(e.message)
+        .to.be.eql('command is invalid and needs more arguments');
     }
   });
 });

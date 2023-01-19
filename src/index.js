@@ -585,7 +585,7 @@ class REPLClient {
     if (!str) return;
     if (typeof str !== 'string')
       throw new TypeError('Not a string or no string given');
-    return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+    return str.replace(/\B([A-Z])/g, '-$1').toLowerCase();
   }
 
   /**
@@ -601,7 +601,7 @@ class REPLClient {
       throw new TypeError('Not a string or no string given');
     return str.includes('--')
       ? str.replace('--', '')
-      : str.replace(/-./g, (x) => x.toUpperCase()[1]);
+      : str.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''));
   }
 
   /**
