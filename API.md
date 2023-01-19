@@ -1,6 +1,3 @@
-Debugger listening on ws://127.0.0.1:42703/bde0f852-cb2f-46db-afb0-cc42a0a2e2ef
-For help, see: https://nodejs.org/en/docs/inspector
-Debugger attached.
 <a name="REPLClient"></a>
 
 ## REPLClient
@@ -182,4 +179,3 @@ Confirmation Prompt
 | [options] | <code>Object</code> |  |  |
 | [options.default] | <code>any</code> |  | Default of confirmation |
 
-Waiting for the debugger to disconnect...
