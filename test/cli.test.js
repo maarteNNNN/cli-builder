@@ -354,4 +354,51 @@ describe('REPL Client tests', () => {
         .to.be.eql('command is invalid and needs more arguments');
     }
   });
+
+  it('it prevents a project name from translating into camelCase with execute', async () => {
+    const projectName = 'Pyaterochka-013152-SKU-auditor';
+    try {
+      const testCli = await initiateCli(
+        { ...exampleOptions },
+        {
+          _: ['create', projectName],
+        },
+      );
+
+      const commands = {
+        create: {
+          execute: ({ argument, options }) => {
+            chai.expect(argument).to.be.eql(projectName);
+          },
+          help: 'test this help',
+        },
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai.expect(e).to.not.throw();
+    }
+  });
+
+  it("it's unable to pass an argument without execute, that would just be a nested command", async () => {
+    const projectName = 'Pyaterochka-013152-SKU-auditor';
+    try {
+      const testCli = await initiateCli(
+        { ...exampleOptions },
+        {
+          _: ['create', projectName],
+        },
+      );
+
+      const commands = {
+        create: ({ argument, options }) => {},
+      };
+
+      await testCli.run(commands);
+    } catch (e) {
+      chai
+        .expect(e.message)
+        .to.be.eql('command is invalid and needs more arguments');
+    }
+  });
 });

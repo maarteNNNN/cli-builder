@@ -341,7 +341,7 @@ class REPLClient {
          */
         if (typeof accumulator.execute === 'function' && !currentValue) {
           await accumulator.execute.call(this, {
-            argument: this.camelCaseToKebab(currentValue),
+            argument: commands[i],
             options,
           });
           if (this.options.interactive) break;
@@ -368,7 +368,7 @@ class REPLClient {
               !accumulator[currentValue].hasOwnProperty('execute')
             ) {
               await accumulator.execute.call(this, {
-                argument: this.camelCaseToKebab(currentValue),
+                argument: commands[i],
                 options,
               });
               if (this.options.interactive) break;
@@ -416,7 +416,7 @@ class REPLClient {
              */
             if (typeof accumulator.execute === 'function') {
               await accumulator.execute.call(this, {
-                argument: this.camelCaseToKebab(currentValue),
+                argument: commands[i],
                 options,
               });
               break;
